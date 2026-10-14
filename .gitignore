@@ -1,0 +1,21 @@
+# Local secrets; the example configuration may be versioned.
+.env
+.env.*
+!.env.example
+
+node_modules/
+.tools/
+work/
+outputs/
+dist/
+.angular/
+coverage/
+playwright-report/
+test-results/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.log
+
+AGENTS.md
+/temp

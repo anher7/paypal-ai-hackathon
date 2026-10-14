@@ -1,0 +1,29 @@
+{
+  "name": "agree-first",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.22.3 <23"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build -w @agree-first/shared && npm run build -w @agree-first/api && npm run build -w @agree-first/web",
+    "test": "npm run test -w @agree-first/api && npm run test -w @agree-first/web && node --test scripts/astropods-gateway/connect.test.mjs",
+    "test:e2e": "playwright test",
+    "start": "node apps/api/dist/index.js",
+    "typecheck": "npm run typecheck -w @agree-first/api",
+    "predev": "npm run build -w @agree-first/shared",
+    "pretest": "npm run build -w @agree-first/shared",
+    "pretest:e2e": "npm run build -w @agree-first/shared",
+    "pretypecheck": "npm run build -w @agree-first/shared"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "typescript": "6.0.2"
+  }
+}

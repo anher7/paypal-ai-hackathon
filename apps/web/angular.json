@@ -1,0 +1,43 @@
+{
+  "$schema": "../../node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "agree-first": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/agree-first",
+            "browser": "src/main.ts",
+            "index": "src/index.html",
+            "tsConfig": "tsconfig.app.json",
+            "styles": ["src/styles.scss"]
+          },
+          "configurations": {
+            "production": {"outputHashing": "all", "budgets": [{"type": "initial", "maximumWarning": "1MB", "maximumError": "2MB"}]},
+            "development": {"optimization": false, "sourceMap": true}
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {"proxyConfig": "proxy.conf.json", "prebundle": {"exclude": ["@agree-first/shared"]}},
+          "configurations": {
+            "development": {"buildTarget": "agree-first:build:development"},
+            "production": {"buildTarget": "agree-first:build:production"}
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {"tsConfig": "tsconfig.spec.json", "runner": "vitest"}
+        }
+      }
+    }
+  },
+  "cli": {"analytics": false}
+}

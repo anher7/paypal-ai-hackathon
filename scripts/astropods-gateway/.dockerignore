@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!agent
+!agent/keepalive.mjs
