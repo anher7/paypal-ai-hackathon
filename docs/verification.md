@@ -11,12 +11,12 @@ Verified locally on macOS ARM64 with Node 22.23.3.
 | Portable CLI setup tests | 7 passed |
 | Desktop browser journeys | 16 passed |
 | Mobile Chromium browser journeys | 16 passed |
-| Hosted persistence/API tests | 15 passed |
+| Hosted persistence/API tests | 26 passed |
 | Production build | Pass |
 | npm dependency audit | 0 reported advisories |
 | Whitespace/diff check | Pass |
 
-Total: **218 passing tests in the final complete `npm run verify` run** (10 November 2026). Type checking, all unit/connection/installer tests, production build and all 32 browser journeys passed together using Playwright’s standard browser cache. The revised desktop design was visually inspected. Mobile layout, consent, approval and payment workflows passed the Chromium browser suite. Earlier mobile and print screenshots are historical evidence from before the typography revision.
+Total: **229 passing tests in the final complete `npm run verify` run** (10 November 2026). Type checking, all unit/connection/installer tests, production build and all 32 browser journeys passed together using Playwright’s standard browser cache. The revised desktop design was visually inspected. Mobile layout, consent, approval and payment workflows passed the Chromium browser suite. Earlier mobile and print screenshots are historical evidence from before the typography revision.
 
 The browser payment integration runs the real API and SQLite with a test-only provider and SDK fixture. It covers consent, exact stored totals, receipt persistence, paid immutability, duplicate payments, amount mismatches, timeout recovery, cancellation and SDK failure. No real-money payment was attempted. The fixture is excluded from the production application.
 
@@ -42,6 +42,11 @@ The owner renamed the existing Zpower channel to **Anher Builds** (`@AnherBuilds
 
 ## Hosted verification
 
-The public app at https://agree-first.tameforum1.chatgpt.site opens without signing in. Cloud D1 checks passed for workspace isolation, saved approval snapshots, same-origin protection, and persistent reload. Fresh live AI drafting and effort estimation passed through the hosted API. PayPal created a real EUR 1.00 sandbox order from the approved revision; retrying reused the same stored order. A separate public-browser journey also drafted and estimated a fresh request, settled three questions and opened PayPal's real sandbox card form. The final hosted capture is awaiting owner approval; no cloud receipt is claimed yet.
+The public app at https://agree-first.tameforum1.chatgpt.site opens without signing in. Cloud D1 checks passed for workspace isolation, saved approval snapshots, same-origin protection, and persistent reload. Fresh live AI drafting and effort estimation passed through the hosted API. PayPal created a real EUR 1.00 sandbox order from the approved revision; retrying reused the same stored order. A separate public-browser journey also drafted and estimated a fresh request, settled three questions and opened PayPal's real sandbox card form. With owner approval, that hosted quote completed a real EUR 1.00 sandbox capture at revision 4: order `7UR94225LL052554U`, capture `5P109687BL8079107`. The receipt survived reload, and opening the editor showed the paid agreement as read-only.
 
 Worker compatibility regressions cover missing global Buffer and unsupported redirect:error; provider code imports Buffer explicitly and uses manual redirects so credentials are not forwarded to a new host. Transport diagnostics redact gateway keys and URLs. All 218 tests, builds and typechecks passed together after these fixes. The final runtime-fix commit also passed [GitHub Actions verification](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42851146661).
+
+
+## Public demo abuse controls
+
+The final full verification run passed 229 tests, builds and typechecks together. Eleven new hosted checks exercise atomic concurrent quotas, cookie resets, IP limits across minutes, the persistent total across UTC days and cleanup, invalid/stale/foreign quote requests, and availability of sample drafting and payment recovery after AI exhaustion. The runtime reserves at most two live AI calls per IP per minute, 12 per IP per UTC day, eight per browser workspace per day, 40 globally per day and 200 across the demo lifetime. Limits are configurable within server-enforced bounds. A dedicated owner-approved Astropods account key replaces the expiring development key and is kept only in private Sites server secrets. No billing settings were changed.

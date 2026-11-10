@@ -38,7 +38,7 @@ A payment timeout does not prove that payment failed. Agree First preserves the 
 
 The complete workflow runs from a fresh request to an approved agreement and verified sandbox receipt. The 1:48 video shows actual input, live AI drafting and estimation, question resolution, price choice, customer consent, PayPal checkout and the same quote’s receipt after reload.
 
-Verification includes 218 passing local tests, production builds, type checking and passing GitHub Actions verification. Coverage includes approval invalidation, exact amounts, duplicate payment protection, provider errors, cancellation and timeout recovery. A real EUR 1.00 sandbox capture was also completed with dummy customer details. No real money was charged.
+Verification includes 229 passing local tests, production builds, type checking and passing GitHub Actions verification. Coverage includes approval invalidation, exact amounts, duplicate payment protection, provider errors, cancellation and timeout recovery. Real EUR 1.00 sandbox captures were completed locally and on the public hosted app with dummy customer details; the hosted receipt survived reload and its paid editor was locked. No real money was charged.
 
 ## What we learned
 
@@ -50,7 +50,7 @@ Authenticated customer sharing, payment webhooks, agreement version comparison a
 
 ## Run and test it
 
-Open the [public hosted app](https://agree-first.tameforum1.chatgpt.site), with no installation or application login. Use dummy data and keep the same browser for the editor, customer review and receipt. Hosted AI uses the owner’s gateway settings and has demo usage limits.
+Open the [public hosted app](https://agree-first.tameforum1.chatgpt.site), with no installation or application login. Use dummy data and keep the same browser for the editor, customer review and receipt. Hosted AI uses a dedicated private gateway key. To protect the demo allowance, live requests are capped per browser, per network and globally, including a persistent total cap. If a limit is reached, the labeled sample draft and manual quote workflow remain available.
 
 For an independent local build, use Node 22.23.3. Complete setup and a judge walkthrough are in the [README](https://github.com/anher7/paypal-ai-hackathon#run-it-on-macos-or-linux) and [judge instructions](https://github.com/anher7/paypal-ai-hackathon/blob/master/docs/judging.md). Local live requests and payments use your own documented Astropods gateway and PayPal sandbox settings; keep those credentials private.
 

@@ -14,10 +14,10 @@ function request(path: string, method = 'GET', body?: unknown, headers: Record<s
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 }
-async function visitor(env: HostedEnvironment) {
+async function visitor(env: HostedEnvironment, ip = '203.0.113.10') {
   const page = await worker.fetch(request('/'), env);
   const setCookie = page.headers.get('set-cookie')!;
-  const headers = { cookie: setCookie.split(';')[0] };
+  const headers = { cookie: setCookie.split(';')[0], 'cf-connecting-ip': ip };
   return {
     setCookie,
     fetch: (path: string, method = 'GET', body?: unknown, extra: Record<string, string> = {}) =>
@@ -25,13 +25,13 @@ async function visitor(env: HostedEnvironment) {
   };
 }
 const input = { title: 'Booking form', customerName: 'Customer', request: examples[0].request };
-async function create(client: Awaited<ReturnType<typeof visitor>>) {
-  const response = await client.fetch('/api/quotes', 'POST', input);
+async function create(client: Awaited<ReturnType<typeof visitor>>, changes: Partial<typeof input> = {}) {
+  const response = await client.fetch('/api/quotes', 'POST', { ...input, ...changes });
   expect(response.status).toBe(201);
   return response.json() as Promise<Quote>;
 }
 
-afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe('hosted API request boundaries', () => {
   it('keeps the guest cookie across requests and hides other visitors quotes', async () => {
@@ -129,4 +129,122 @@ describe('hosted API request boundaries', () => {
     expect((await owner.fetch('/api/quotes', 'POST', input, { 'content-type': 'text/plain' })).status).toBe(415);
     expect(await (await owner.fetch('/api/quotes')).json()).toEqual([]);
   });
+});
+
+
+const liveEnvironment = { ASTRO_GATEWAY_URL: 'https://gateway.example', ASTRO_GATEWAY_API_KEY: 'test-key' };
+function invalidCompletion() {
+  const upstream = vi.fn(async () => Response.json({ invalid: 'upstream envelope' }));
+  vi.stubGlobal('fetch', upstream);
+  return upstream;
+}
+async function customQuote(client: Awaited<ReturnType<typeof visitor>>) {
+  return create(client, { request: 'Build a custom booking form for my studio.' });
+}
+
+describe('public demo AI abuse limits', () => {
+  it('enforces the default burst across concurrent requests with reset cookies', async () => {
+    const env = environment(liveEnvironment);
+    const upstream = invalidCompletion();
+    const clients = await Promise.all([visitor(env), visitor(env), visitor(env)]);
+    const quotes = await Promise.all(clients.map(customQuote));
+    const responses = await Promise.all(clients.map((client, index) =>
+      client.fetch(`/api/quotes/${quotes[index].id}/draft`, 'POST', { expectedRevision: 1 })));
+    expect(responses.map((response) => response.status).sort()).toEqual([429, 502, 502]);
+    expect(upstream).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the per-IP daily limit after cookie resets and burst windows change', async () => {
+    const env = environment({ ...liveEnvironment, HOSTED_AI_IP_DAILY_LIMIT: '2' });
+    const upstream = invalidCompletion();
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
+    const statuses = [];
+    for (let index = 0; index < 3; index += 1) {
+      clock.mockReturnValue(1_800_000_000_000 + index * 60_001);
+      const client = await visitor(env);
+      const quote = await customQuote(client);
+      statuses.push((await client.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 1 })).status);
+    }
+    expect(statuses).toEqual([502, 502, 429]);
+    expect(upstream).toHaveBeenCalledTimes(2);
+  });
+
+  it('reserves the lifetime budget atomically across concurrent clients with different IPs', async () => {
+    const env = environment({ ...liveEnvironment, HOSTED_AI_TOTAL_LIMIT: '2' });
+    const upstream = invalidCompletion();
+    const clients = await Promise.all(Array.from({ length: 6 }, (_, index) => visitor(env, `203.0.113.${index + 20}`)));
+    const quotes = await Promise.all(clients.map(customQuote));
+    const responses = await Promise.all(clients.map((client, index) =>
+      client.fetch(`/api/quotes/${quotes[index].id}/draft`, 'POST', { expectedRevision: 1 })));
+    expect(responses.filter((response) => response.status === 502)).toHaveLength(2);
+    expect(responses.filter((response) => response.status === 429)).toHaveLength(4);
+    expect(upstream).toHaveBeenCalledTimes(2);
+    expect(await env.DB.prepare('SELECT count FROM hosted_limits WHERE id = ?').bind('ai-total:v1').first()).toEqual({ count: 2 });
+  });
+
+  it('preserves the lifetime budget across UTC days, new IPs and expired-quota cleanup', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-11-10T12:00:00Z'));
+    const env = environment({ ...liveEnvironment, HOSTED_AI_TOTAL_LIMIT: '2' });
+    const upstream = invalidCompletion();
+    const statuses = [];
+    for (let index = 0; index < 3; index += 1) {
+      vi.setSystemTime(new Date(`2026-11-${10 + index * 3}T12:00:00Z`));
+      const client = await visitor(env, `198.51.100.${index + 10}`);
+      const quote = await customQuote(client);
+      statuses.push((await client.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 1 })).status);
+    }
+    expect(statuses).toEqual([502, 502, 429]);
+    expect(upstream).toHaveBeenCalledTimes(2);
+    expect(await env.DB.prepare('SELECT count, expires_at FROM hosted_limits WHERE id = ?').bind('ai-total:v1').first())
+      .toEqual({ count: 2, expires_at: Number.MAX_SAFE_INTEGER });
+  });
+
+  it('does not charge the AI budget for invalid revisions, inputs or foreign/nonexistent quotes', async () => {
+    const env = environment({ ...liveEnvironment, HOSTED_AI_TOTAL_LIMIT: '1' });
+    const upstream = invalidCompletion();
+    const owner = await visitor(env);
+    const quote = await customQuote(owner);
+    expect((await owner.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 999 })).status).toBe(409);
+    expect((await owner.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 'invalid' })).status).toBe(400);
+    expect((await owner.fetch('/api/quotes/00000000-0000-0000-0000-000000000000/draft', 'POST', { expectedRevision: 1 })).status).toBe(404);
+    const stranger = await visitor(env);
+    expect((await stranger.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 1 })).status).toBe(404);
+    expect((await env.DB.prepare("SELECT id FROM hosted_limits WHERE id LIKE 'ai-%'").all()).results).toEqual([]);
+    expect(upstream).not.toHaveBeenCalled();
+    expect((await owner.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 1 })).status).toBe(502);
+    expect(upstream).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps static drafting and checkout recovery accessible after the live AI budget is spent', async () => {
+    const env = environment({ ...liveEnvironment, HOSTED_AI_TOTAL_LIMIT: '1' });
+    const upstream = invalidCompletion();
+    const owner = await visitor(env);
+    const quote = await customQuote(owner);
+    expect((await owner.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 1 })).status).toBe(502);
+    const exhausted = await owner.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 1 });
+    expect(exhausted.status).toBe(429);
+    expect(await exhausted.json()).toEqual({ error: { code: 'DEMO_LIMIT',
+      message: 'The demo’s total AI allowance has been reached. You can still use the sample draft and edit quotes by hand.' } });
+    const sample = await create(owner);
+    const drafted = await owner.fetch(`/api/quotes/${sample.id}/draft`, 'POST', { expectedRevision: 1 });
+    expect(drafted.status).toBe(200);
+    expect(await drafted.json()).toMatchObject({ draftSource: 'example' });
+    const recovery = await owner.fetch(`/api/quotes/${quote.id}/checkout-recovery`);
+    expect(recovery.status).toBe(200);
+    expect(await recovery.json()).toBeNull();
+    expect(upstream).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([['999999', 500], ['Infinity', 200], ['0', 1], ['not-a-number', 200], ['2.9', 2]] as const)
+    ('clamps total-budget configuration %s to %s calls', async (configuration, maximum) => {
+      const env = environment({ ...liveEnvironment, HOSTED_AI_TOTAL_LIMIT: configuration });
+      await env.DB.prepare('INSERT INTO hosted_limits (id, count, expires_at) VALUES (?, ?, ?)')
+        .bind('ai-total:v1', maximum, Number.MAX_SAFE_INTEGER).run();
+      const upstream = invalidCompletion();
+      const owner = await visitor(env);
+      const quote = await customQuote(owner);
+      expect((await owner.fetch(`/api/quotes/${quote.id}/draft`, 'POST', { expectedRevision: 1 })).status).toBe(429);
+      expect(upstream).not.toHaveBeenCalled();
+    });
 });

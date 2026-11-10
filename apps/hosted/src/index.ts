@@ -19,6 +19,9 @@ export interface HostedEnvironment extends Record<string, unknown> {
   ASTRO_GATEWAY_EXPIRES_AT?: string;
   MODEL_DEFAULT?: string;
   HOSTED_AI_DAILY_LIMIT?: string;
+  HOSTED_AI_IP_DAILY_LIMIT?: string;
+  HOSTED_AI_IP_BURST_LIMIT?: string;
+  HOSTED_AI_TOTAL_LIMIT?: string;
 }
 const cookieName = '__Host-agree-first';
 const sessionPattern = /^[a-f0-9]{64}$/;
@@ -61,10 +64,14 @@ async function requestBody(request: Request): Promise<unknown> {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { throw new AppError('INVALID_JSON', 'Check the JSON request and try again.'); }
 }
-async function consume(db: HostedDatabase, key: string, maximum: number, expiresAt: number) {
+async function consume(db: HostedDatabase, key: string, maximum: number, expiresAt: number, message = 'This demo has reached its usage limit. Please try again later.') {
   const result = await db.prepare(`INSERT INTO hosted_limits (id, count, expires_at) VALUES (?, 1, ?)
     ON CONFLICT(id) DO UPDATE SET count=count+1 WHERE count < ? RETURNING count`).bind(key, expiresAt, maximum).first();
-  if (!result) throw new AppError('DEMO_LIMIT', 'This demo has reached its usage limit. Please try again later.', 429);
+  if (!result) throw new AppError('DEMO_LIMIT', message, 429);
+}
+function boundedLimit(value: string | undefined, fallback: number, maximum: number): number {
+  const numeric = value?.trim() ? Number(value) : NaN;
+  return Number.isFinite(numeric) ? Math.min(maximum, Math.max(1, Math.floor(numeric))) : fallback;
 }
 function safeEnvironment(env: HostedEnvironment): NodeJS.ProcessEnv {
   const keys = ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_MERCHANT_ID', 'ASTRO_GATEWAY_URL', 'ASTRO_GATEWAY_API_KEY', 'ASTRO_GATEWAY_EXPIRES_AT', 'MODEL_DEFAULT'];
@@ -106,22 +113,37 @@ export async function handleApi(request: Request, env: HostedEnvironment, worksp
   const store = await openHostedStore(env.DB, workspaceId, quoteId, method !== 'GET');
   try {
     const checkpoint = async () => store.checkpoint();
+    const consumeAi = async () => {
+      // Each reservation is one atomic statement, including across Workers. IP
+      // limits survive cookie resets; the final counter survives day changes.
+      await consume(env.DB, `ai-burst:${client}:${Math.floor(Date.now() / 60000)}`,
+        boundedLimit(env.HOSTED_AI_IP_BURST_LIMIT, 2, 4), expiresAt,
+        'This demo has reached its AI request limit for your network. Try again in a minute.');
+      await consume(env.DB, `ai-client:${client}:${day}`,
+        boundedLimit(env.HOSTED_AI_IP_DAILY_LIMIT, 12, 24), expiresAt,
+        'This demo has reached its daily AI allowance for your network. Try again after midnight UTC.');
+      await consume(env.DB, `ai-workspace:${workspaceId}:${day}`, 8, expiresAt,
+        'This workspace has reached its daily AI allowance. Try again after midnight UTC.');
+      await consume(env.DB, `ai-global:${day}`, boundedLimit(env.HOSTED_AI_DAILY_LIMIT, 40, 100), expiresAt,
+        'This demo has reached its shared daily AI allowance. Try again after midnight UTC.');
+      // This counter must not be deleted by expired daily/burst quota cleanup.
+      await consume(env.DB, 'ai-total:v1', boundedLimit(env.HOSTED_AI_TOTAL_LIMIT, 200, 500), Number.MAX_SAFE_INTEGER,
+        'The demo’s total AI allowance has been reached. You can still use the sample draft and edit quotes by hand.');
+    };
     const provider = {
       ...drafting,
       draft: async (requestText: string) => {
         await checkpoint();
         const isExample = examples.some((example) => example.request.trim() === requestText.trim());
         if (!isExample && drafting.configured) {
-          await consume(env.DB, `ai-workspace:${workspaceId}:${day}`, 8, expiresAt);
-          await consume(env.DB, `ai-global:${day}`, Math.min(100, Math.max(1, Number(env.HOSTED_AI_DAILY_LIMIT) || 40)), expiresAt);
+          await consumeAi();
         }
         return drafting.draft(requestText);
       },
       estimate: async (context: Parameters<NonNullable<typeof drafting.estimate>>[0]) => {
         await checkpoint();
         if (drafting.configured) {
-          await consume(env.DB, `ai-workspace:${workspaceId}:${day}`, 8, expiresAt);
-          await consume(env.DB, `ai-global:${day}`, Math.min(100, Math.max(1, Number(env.HOSTED_AI_DAILY_LIMIT) || 40)), expiresAt);
+          await consumeAi();
         }
         return drafting.estimate!(context);
       },
