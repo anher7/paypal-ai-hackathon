@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { AppConfig, CheckoutRecovery, ExampleRequest, OrderResult, Quote, QuoteCreate, QuoteUpdate } from '@agree-first/shared';
+import { AgreementView, AppConfig, CheckoutRecovery, CustomerLink, ExampleRequest, OrderResult, Quote, QuoteCreate, QuoteUpdate } from '@agree-first/shared';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -16,6 +16,25 @@ export class QuoteApi {
   draft(id: string, expectedRevision: number): Observable<Quote> { return this.http.post<Quote>(`/api/quotes/${encodeURIComponent(id)}/draft`, { expectedRevision }); }
   estimate(id: string, expectedRevision: number): Observable<Quote> { return this.http.post<Quote>(`/api/quotes/${encodeURIComponent(id)}/estimate`, { expectedRevision }); }
   approve(id: string, expectedRevision: number): Observable<Quote> { return this.http.post<Quote>(`/api/quotes/${encodeURIComponent(id)}/approve`, { expectedRevision }); }
+  share(id: string, expectedRevision: number): Observable<CustomerLink> {
+    return this.http.post<CustomerLink>(`/api/quotes/${encodeURIComponent(id)}/share`, { expectedRevision });
+  }
+  revokeShare(id: string, expectedRevision: number): Observable<{ revoked: true }> {
+    return this.http.post<{ revoked: true }>(`/api/quotes/${encodeURIComponent(id)}/share/revoke`, { expectedRevision });
+  }
+  customer(token: string): Observable<AgreementView> {
+    return this.http.get<AgreementView>('/api/customer', { headers: this.customerHeaders(token) });
+  }
+  customerRecovery(token: string): Observable<CheckoutRecovery | null> {
+    return this.http.get<CheckoutRecovery | null>('/api/customer/checkout-recovery', { headers: this.customerHeaders(token) });
+  }
+  customerOrder(token: string, approvedRevision: number): Observable<OrderResult> {
+    return this.http.post<OrderResult>('/api/customer/orders', { approvedRevision, scopeAccepted: true }, { headers: this.customerHeaders(token) });
+  }
+  customerCapture(token: string, orderId: string, approvedRevision: number): Observable<AgreementView> {
+    return this.http.post<AgreementView>(`/api/customer/orders/${encodeURIComponent(orderId)}/capture`, { approvedRevision, scopeAccepted: true }, { headers: this.customerHeaders(token) });
+  }
+  private customerHeaders(token: string): { Authorization: string } { return { Authorization: `Bearer ${token}` }; }
   order(id: string, approvedRevision: number): Observable<OrderResult> {
     return this.http.post<OrderResult>(`/api/quotes/${encodeURIComponent(id)}/orders`, { approvedRevision, scopeAccepted: true });
   }

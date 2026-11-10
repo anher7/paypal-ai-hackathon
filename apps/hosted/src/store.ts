@@ -12,6 +12,12 @@ export interface HostedDatabase {
   };
 }
 
+export interface CustomerGrantWrite {
+  tokenHash: string;
+  approvedRevision: number;
+  expiresAt: number;
+}
+
 interface StoredRow {
   id: string;
   payload: string;
@@ -36,7 +42,7 @@ export async function openHostedStore(
   workspaceId: string,
   quoteId?: string,
   mutating = false,
-): Promise<{ store: QuoteStore; checkpoint(): Promise<void>; close(): Promise<void> }> {
+): Promise<{ store: QuoteStore; checkpoint(): Promise<void>; saveCustomerGrant(grant: CustomerGrantWrite): Promise<void>; revokeCustomerGrant(): Promise<void>; close(): Promise<void> }> {
   let activeId = quoteId;
   const token = crypto.randomUUID();
   let locked = false;
@@ -197,6 +203,32 @@ export async function openHostedStore(
   return {
     store,
     checkpoint,
+    saveCustomerGrant: async (grant) => {
+      ensureWritable();
+      if (!activeId || !locked) throw lostLease();
+      await checkpoint();
+      const result = await db.prepare(`INSERT INTO hosted_customer_grants
+        (quote_id, workspace_id, token_hash, approved_revision, expires_at)
+        SELECT id, workspace_id, ?, ?, ? FROM hosted_quotes
+        WHERE id = ? AND workspace_id = ? AND lock_token = ? AND lock_until > ?
+        ON CONFLICT(quote_id) DO UPDATE SET token_hash = excluded.token_hash,
+          approved_revision = excluded.approved_revision, expires_at = excluded.expires_at,
+          workspace_id = excluded.workspace_id`)
+        .bind(grant.tokenHash, grant.approvedRevision, grant.expiresAt,
+          activeId, workspaceId, token, Date.now()).run();
+      if (result.meta.changes !== 1) throw lostLease();
+    },
+    revokeCustomerGrant: async () => {
+      ensureWritable();
+      if (!activeId || !locked) throw lostLease();
+      await checkpoint();
+      await db.prepare(`DELETE FROM hosted_customer_grants WHERE quote_id = ? AND workspace_id = ?
+        AND EXISTS (SELECT 1 FROM hosted_quotes WHERE id = ? AND workspace_id = ?
+          AND lock_token = ? AND lock_until > ?)`)
+        .bind(activeId, workspaceId, activeId, workspaceId, token, Date.now()).run();
+      // Distinguish an absent grant from a lease that expired during the delete.
+      await checkpoint();
+    },
     close: async () => {
       if (closed) return;
       try {

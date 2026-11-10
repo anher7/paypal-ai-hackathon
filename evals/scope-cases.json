@@ -1,0 +1,6 @@
+[
+  {"id":"cafe-menu","request":"Design a two-sided cafe menu with revisions. Deliver print-ready files by Friday.","reviewFor":["Number of revision rounds","Print file specifications and printing responsibility","Which Friday and deadline timezone"]},
+  {"id":"booking-site","request":"Build a five-page website with a booking form and ongoing support.","reviewFor":["Inquiry form versus live booking and availability","Duration and boundaries of ongoing support"]},
+  {"id":"logo-delivery","request":"Make a logo with revisions and all the source files. Need it ASAP.","reviewFor":["Number of revision rounds","Required editable file formats","Concrete delivery deadline"]},
+  {"id":"social-launch","request":"Create social posts with images for our launch.","reviewFor":["Number of posts","Target platforms and dimensions","Who supplies or licenses images","Launch date and delivery deadline"]}
+]

@@ -223,3 +223,13 @@ select { width: 100%; display: block; background: #ffffff; color: #24382e; borde
 }
 
 .print-only { display: none; }
+
+.customer-sharing { margin-top: 28px; }
+.customer-sharing > p { max-width: 760px; }
+.share-actions, .share-link-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.share-link-label { display: block; font-size: 13px; font-weight: 600; margin: 22px 0 7px; }
+.share-link-row { margin-bottom: 9px; }
+.share-link-row input { flex: 1 1 300px; min-width: 0; padding: 12px; color: #24322e; border: 1px solid #929d93; background: #fff; border-radius: 4px; font-size: 13px; }
+.customer-trust { font-size: 13px; color: #536056; border-left: 3px solid #12645a; padding-left: 14px; margin-bottom: 25px; }
+@media (max-width: 650px) { .share-actions > button, .share-link-row > button { flex: 1 1 100%; } }
+@media print { .customer-trust { display: none; } }

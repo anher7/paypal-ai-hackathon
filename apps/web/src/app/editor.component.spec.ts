@@ -7,7 +7,7 @@ import { QuoteApi } from './quote-api';
 import { exampleQuote } from './test-fixtures';
 
 describe('Scope editor', () => {
-  const api = { get: vi.fn(), update: vi.fn(), approve: vi.fn(), config: vi.fn(), draft: vi.fn(), estimate: vi.fn() };
+  const api = { get: vi.fn(), update: vi.fn(), approve: vi.fn(), config: vi.fn(), draft: vi.fn(), estimate: vi.fn(), share: vi.fn(), revokeShare: vi.fn() };
   const workEstimate: WorkEstimate = { source: 'ai', model: 'dummy-model', generatedAt: '2026-10-14T10:00:00.000Z', stale: false, tasks: [{ name: 'Build and test a form', withoutAgent: { minMinutes: 180, maxMinutes: 300 }, withAgent: { minMinutes: 120, maxMinutes: 360 }, agentHelp: 'Draft form code.', humanWork: 'Review, correct and test the result.' }], assumptions: ['Customer provides form fields.'], totals: { withoutAgent: { minMinutes: 180, maxMinutes: 300, minPriceCents: 15000, maxPriceCents: 25000 }, withAgent: { minMinutes: 120, maxMinutes: 360, minPriceCents: 10000, maxPriceCents: 30000 } } };
   let component: EditorComponent;
   let fixture: ComponentFixture<EditorComponent>;
@@ -21,6 +21,41 @@ describe('Scope editor', () => {
     }).compileComponents();
     fixture = TestBed.createComponent(EditorComponent);
     component = fixture.componentInstance;
+  });
+
+  it('shares only an explicitly approved saved revision and closes the capability on request', async () => {
+    const quote = exampleQuote();
+    component.quote.set({ ...quote, status: 'ready', approved: { revision: 2, title: quote.title, customerName: quote.customerName, request: quote.request, included: quote.included, excluded: quote.excluded, needs: quote.needs, questions: [], priceCents: 100, currency: 'EUR', approvedAt: quote.updatedAt } });
+    component.config.set({ aiMode: 'examples', currency: 'EUR', paypalConfigured: false, paypalClientId: null, localOnly: false, customerSharing: true });
+    const token = 'a'.repeat(64);
+    api.share.mockReturnValue(of({ token, revision: 2, expiresAt: '2026-11-17T12:00:00Z' }));
+    expect(api.share).not.toHaveBeenCalled();
+    component.generateCustomerLink();
+    expect(api.share).toHaveBeenCalledWith(quote.id, 2);
+    expect(component.customerLinkUrl()).toBe(`${window.location.origin}/customer#${token}`);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    await component.copyCustomerLink();
+    expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/customer#${token}`);
+    api.revokeShare.mockReturnValue(of({ revoked: true }));
+    component.revokeCustomerLink();
+    expect(api.revokeShare).toHaveBeenCalledWith(quote.id, 2);
+    expect(component.customerLinkUrl()).toBeNull();
+    expect(component.shareMessage()).toContain('closed');
+  });
+
+  it('hides a generated link as soon as scope changes and blocks sharing unsaved changes', () => {
+    const quote = exampleQuote();
+    component.quote.set({ ...quote, status: 'ready', approved: { revision: 2, title: quote.title, customerName: quote.customerName, request: quote.request, included: quote.included, excluded: quote.excluded, needs: quote.needs, questions: [], priceCents: 100, currency: 'EUR', approvedAt: quote.updatedAt } });
+    component.config.set({ aiMode: 'examples', currency: 'EUR', paypalConfigured: false, paypalClientId: null, localOnly: false, customerSharing: true });
+    component.customerLink.set({ token: 'a'.repeat(64), revision: 2, expiresAt: '2026-11-17T12:00:00Z' });
+    component.form.controls.included.setValue('Changed scope'); component.form.markAsDirty();
+    expect(component.customerLinkUrl()).toBeNull();
+    component.generateCustomerLink();
+    expect(api.share).not.toHaveBeenCalled();
+    component.form.markAsPristine(); component.quote.update((value) => value ? { ...value, revision: 3 } : null);
+    expect(component.customerLinkUrl()).toBeNull();
+    component.generateCustomerLink(); expect(api.share).not.toHaveBeenCalled();
   });
 
   it('shows live drafting honestly and leaves the entered price unchanged', () => {

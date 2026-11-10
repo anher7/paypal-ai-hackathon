@@ -6,6 +6,7 @@ import type { HostedDatabase } from './store.js';
 export function database() {
   const connection = new Database(':memory:');
   connection.exec(readFileSync(new URL('../../../drizzle/0000_hosted_workspace.sql', import.meta.url), 'utf8'));
+  connection.exec(readFileSync(new URL('../../../drizzle/0001_customer_grants.sql', import.meta.url), 'utf8'));
   const db: HostedDatabase = {
     prepare(sql) {
       let values: unknown[] = [];

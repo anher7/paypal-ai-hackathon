@@ -1,0 +1,210 @@
+{
+  "target": "https://agree-first.tameforum1.chatgpt.site",
+  "startedAt": "2026-11-10T17:21:21.781Z",
+  "model": "claude-haiku-4-5",
+  "type": "Developer-run synthetic cases, one model response each; not user research or proof of reduced disputes.",
+  "cases": [
+    {
+      "id": "cafe-menu",
+      "request": "Design a two-sided cafe menu with revisions. Deliver print-ready files by Friday.",
+      "reviewFor": [
+        "Number of revision rounds",
+        "Print file specifications and printing responsibility",
+        "Which Friday and deadline timezone"
+      ],
+      "quoteId": "a27bd79d-0ca8-44f2-b486-d3d77588837c",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Menu design for both sides of a single sheet",
+        "Print-ready file delivery",
+        "Revision work on the design"
+      ],
+      "excluded": [
+        "Printing or physical production",
+        "Unlimited revision rounds",
+        "Menu content/copywriting",
+        "Food photography",
+        "Lamination or finishing services"
+      ],
+      "needs": [
+        "Menu items and pricing details",
+        "Restaurant name and branding (logo, colors, fonts if applicable)",
+        "Cafe style/theme preferences",
+        "Dietary information or special notes to include",
+        "File format specifications (PDF, AI, INDD, etc.)",
+        "Paper size and final dimensions",
+        "Cafe contact details or hours if to be included"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "with revisions",
+          "prompt": "How many revision rounds are included? What types of changes count as revisions?"
+        },
+        {
+          "sourcePhrase": "by Friday",
+          "prompt": "Which Friday? What time is the deadline, and what timezone?"
+        },
+        {
+          "sourcePhrase": "print-ready files",
+          "prompt": "What file format do you need (PDF, native design file, both)? Are there specific print specifications (resolution, color mode, bleed settings)?"
+        }
+      ],
+      "contentReview": null
+    },
+    {
+      "id": "booking-site",
+      "request": "Build a five-page website with a booking form and ongoing support.",
+      "reviewFor": [
+        "Inquiry form versus live booking and availability",
+        "Duration and boundaries of ongoing support"
+      ],
+      "quoteId": "3b2097ea-7dbe-4ee6-b2e8-be5ea8536024",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Five-page website build",
+        "Booking form implementation"
+      ],
+      "excluded": [
+        "Design/visual style choices",
+        "Content creation or copywriting",
+        "Hosting setup or domain registration",
+        "Payment processing integration",
+        "Ongoing support scope, duration, and response times",
+        "Post-launch maintenance or updates",
+        "SEO optimization",
+        "Mobile responsiveness details",
+        "Third-party integrations beyond the booking form"
+      ],
+      "needs": [
+        "Clarification on what 'ongoing support' means",
+        "Page structure and purpose of each of the five pages",
+        "Booking form requirements and data fields",
+        "Technology stack or platform preference",
+        "Current content or reference materials",
+        "Hosting and domain status",
+        "Budget or timeline expectations"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "ongoing support",
+          "prompt": "What does 'ongoing support' include? For example: bug fixes, feature requests, updates, email responses, response time guarantee, or duration (months/years)?"
+        },
+        {
+          "sourcePhrase": "five-page website",
+          "prompt": "What should each of the five pages contain? (e.g., Home, Services, About, Contact, Booking confirmation—or different pages?)"
+        },
+        {
+          "sourcePhrase": "booking form",
+          "prompt": "What information must the booking form collect, and where/how should bookings be stored or confirmed?"
+        }
+      ],
+      "contentReview": null
+    },
+    {
+      "id": "logo-delivery",
+      "request": "Make a logo with revisions and all the source files. Need it ASAP.",
+      "reviewFor": [
+        "Number of revision rounds",
+        "Required editable file formats",
+        "Concrete delivery deadline"
+      ],
+      "quoteId": "302d2192-11f4-4c26-937f-9831c644503d",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Initial logo design",
+        "Revisions to logo",
+        "Delivery of source files"
+      ],
+      "excluded": [
+        "Number of revision rounds",
+        "File formats to be delivered",
+        "Specific style or design direction",
+        "Trademarking or legal review",
+        "Print-ready specifications",
+        "Animation or multiple versions"
+      ],
+      "needs": [
+        "Design style preferences (modern, minimal, playful, corporate, etc.)",
+        "Industry or business type",
+        "Color requirements or preferences",
+        "Target audience",
+        "Logo usage context (web, print, social media, etc.)",
+        "Maximum number of included revisions",
+        "Preferred source file formats (AI, PSD, Figma, etc.)",
+        "Specific deadline date instead of 'ASAP'"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "revisions and all the source files",
+          "prompt": "How many revision rounds are included? Are unlimited revisions expected?"
+        },
+        {
+          "sourcePhrase": "Need it ASAP",
+          "prompt": "What is the specific deadline? (ASAP is unclear and may cause disputes)"
+        },
+        {
+          "sourcePhrase": "Make a logo",
+          "prompt": "What is the logo for? What style, industry, or design direction do you prefer?"
+        }
+      ],
+      "contentReview": null
+    },
+    {
+      "id": "social-launch",
+      "request": "Create social posts with images for our launch.",
+      "reviewFor": [
+        "Number of posts",
+        "Target platforms and dimensions",
+        "Who supplies or licenses images",
+        "Launch date and delivery deadline"
+      ],
+      "quoteId": "dd0156e1-7689-485b-b2fa-f452fc0fd6e0",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Creating social media post content",
+        "Pairing posts with images"
+      ],
+      "excluded": [
+        "Designing or creating images from scratch",
+        "Posting to social media accounts",
+        "Paid social media advertising",
+        "Photography or image licensing",
+        "Social media account management",
+        "Analytics or performance reporting"
+      ],
+      "needs": [
+        "Images (provided by customer or source identified)",
+        "Target social media platforms (Instagram, LinkedIn, TikTok, etc.)",
+        "Number of posts needed",
+        "Tone and messaging direction for launch",
+        "Key details about what is being launched",
+        "Any brand guidelines or style requirements",
+        "Target audience description"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "images for our launch",
+          "prompt": "Will you provide the images, or do you need the freelancer to source/create them?"
+        },
+        {
+          "sourcePhrase": "social posts",
+          "prompt": "Which platforms should the posts be written for, and how many posts do you need?"
+        },
+        {
+          "sourcePhrase": "for our launch",
+          "prompt": "What is being launched, and what are the main messages you want to communicate?"
+        }
+      ],
+      "contentReview": null
+    }
+  ],
+  "completedAt": "2026-11-10T17:24:08.183Z"
+}

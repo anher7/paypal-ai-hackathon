@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AppConfig, calculateWorkEstimateTotals, parseEuroPrice, priceToInput, Quote, QuoteUpdate, ScopeQuestion, WorkEstimate } from '@agree-first/shared';
+import { AppConfig, calculateWorkEstimateTotals, CustomerLink, parseEuroPrice, priceToInput, Quote, QuoteUpdate, ScopeQuestion, WorkEstimate } from '@agree-first/shared';
 import { Observable, of, switchMap } from 'rxjs';
 import { errorMessage, QuoteApi } from './quote-api';
 import { EstimateComparisonComponent } from './estimate-comparison.component';
@@ -72,6 +72,21 @@ export function highlightRequest(request: string, questions: ScopeQuestion[]): R
             </fieldset>
           </form>
         }
+        @if (config()?.customerSharing && current.approved && current.approved.revision === current.revision) {
+          <section class="paper customer-sharing" aria-labelledby="customer-sharing-title">
+            <h2 id="customer-sharing-title">Send the agreement to your customer</h2>
+            <p>They can open it on their own device, review the approved work and price, and pay through PayPal.</p>
+            @if (form.dirty) {<p class="small-text">Save your changes and approve the new revision before sharing it. A saved change closes the previous link.</p>}
+            @else {
+              <p class="small-text">Keep this link private. Anyone with it can view this agreement and its receipt. It expires after 7 days. Creating another link closes the previous one.</p>
+              <div class="share-actions"><button mat-flat-button type="button" (click)="generateCustomerLink()" [disabled]="busy() || shareBusy()">{{ shareBusy() ? 'One moment…' : customerLinkUrl() ? 'Create replacement link' : 'Create customer link' }}</button><button mat-stroked-button type="button" (click)="revokeCustomerLink()" [disabled]="busy() || shareBusy()">Close customer link</button></div>
+              @if (customerLinkUrl(); as url) {
+                <label class="share-link-label" for="customer-link">Private customer link</label><div class="share-link-row"><input id="customer-link" type="text" [value]="url" readonly (focus)="selectCustomerLink($event)"><button mat-stroked-button type="button" (click)="copyCustomerLink()">Copy link</button></div><p class="small-text">{{ shareExpiryLabel() }}</p>
+              }
+            }
+            @if (shareMessage()) {<app-message [text]="shareMessage()" [error]="shareError()" />}
+          </section>
+        }
       } @else if (!hasError()) {<p role="status">Opening your quote…</p>}
     </div>
   `,
@@ -86,6 +101,10 @@ export class EditorComponent {
   readonly busy = signal(false);
   readonly message = signal('');
   readonly hasError = signal(false);
+  readonly shareBusy = signal(false);
+  readonly shareMessage = signal('');
+  readonly shareError = signal(false);
+  readonly customerLink = signal<CustomerLink | null>(null);
   private readonly formChange = signal(0);
   readonly form = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(160)]], customerName: ['', [Validators.required, Validators.maxLength(160)]],
@@ -98,6 +117,49 @@ export class EditorComponent {
     this.api.config().pipe(takeUntilDestroyed()).subscribe({ next: (config) => this.config.set(config), error: () => this.config.set(null) });
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.formChange.update((value) => value + 1));
     this.route.paramMap.pipe(switchMap((params) => this.api.get(params.get('id') ?? '')), takeUntilDestroyed()).subscribe({ next: (quote) => this.acceptQuote(quote), error: (error: unknown) => this.fail(error) });
+  }
+
+  customerLinkUrl(): string | null {
+    this.formChange();
+    const link = this.customerLink();
+    const quote = this.quote();
+    return link && quote && !this.form.dirty && quote.approved?.revision === quote.revision && link.revision === quote.revision
+      ? `${window.location.origin}/customer#${link.token}` : null;
+  }
+  shareExpiryLabel(): string {
+    const expiresAt = this.customerLink()?.expiresAt;
+    return expiresAt ? `Expires ${new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(expiresAt))}.` : '';
+  }
+  selectCustomerLink(event: FocusEvent): void { (event.target as HTMLInputElement).select(); }
+  async copyCustomerLink(): Promise<void> {
+    const url = this.customerLinkUrl();
+    if (!url) { return; }
+    try {
+      await navigator.clipboard.writeText(url);
+      this.shareMessage.set('Customer link copied. Send it privately to your customer.'); this.shareError.set(false);
+    } catch {
+      this.shareMessage.set('Select the link above and copy it to send to your customer.'); this.shareError.set(false);
+    }
+  }
+  generateCustomerLink(): void { this.changeCustomerLink('create'); }
+  revokeCustomerLink(): void { this.changeCustomerLink('revoke'); }
+  private changeCustomerLink(action: 'create' | 'revoke'): void {
+    const quote = this.quote();
+    if (!this.config()?.customerSharing || !quote?.approved || quote.approved.revision !== quote.revision || this.form.dirty || this.busy() || this.shareBusy()) { return; }
+    this.shareBusy.set(true); this.shareMessage.set(''); this.shareError.set(false); this.customerLink.set(null);
+    const request: Observable<CustomerLink | { revoked: true }> = action === 'create' ? this.api.share(quote.id, quote.revision) : this.api.revokeShare(quote.id, quote.revision);
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (result) => {
+        this.shareBusy.set(false);
+        if (action === 'create' && 'token' in result && this.quote()?.revision === quote.revision) {
+          this.customerLink.set(result);
+          this.shareMessage.set('Customer link ready. Copy it and send it privately.');
+        } else {
+          this.customerLink.set(null); this.shareMessage.set('Customer link closed. Anyone with the old link can no longer open this agreement.');
+        }
+      },
+      error: (error: unknown) => { this.shareBusy.set(false); this.shareError.set(true); this.shareMessage.set(errorMessage(error)); },
+    });
   }
 
   private questionForm(question: ScopeQuestion) {
@@ -194,6 +256,7 @@ export class EditorComponent {
     return this.api.update(quote.id, update);
   }
   private acceptQuote(quote: Quote): void {
+    if (this.customerLink()?.revision !== quote.revision) { this.customerLink.set(null); this.shareMessage.set(''); }
     this.quote.set(quote);
     this.form.controls.questions.clear();
     for (const question of quote.questions) { this.form.controls.questions.push(this.questionForm(question)); }

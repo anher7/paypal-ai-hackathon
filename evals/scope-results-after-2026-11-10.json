@@ -1,0 +1,213 @@
+{
+  "target": "https://agree-first.tameforum1.chatgpt.site",
+  "startedAt": "2026-11-10T17:29:02.042Z",
+  "model": "claude-haiku-4-5",
+  "type": "Developer-run synthetic cases, one model response each; not user research or proof of reduced disputes.",
+  "cases": [
+    {
+      "id": "cafe-menu",
+      "request": "Design a two-sided cafe menu with revisions. Deliver print-ready files by Friday.",
+      "reviewFor": [
+        "Number of revision rounds",
+        "Print file specifications and printing responsibility",
+        "Which Friday and deadline timezone"
+      ],
+      "quoteId": "c81d9f73-3c8e-4804-a656-2a73979ec3be",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Design of two-sided cafe menu (front and back)",
+        "Print-ready file delivery",
+        "Revisions (extent pending clarification)"
+      ],
+      "excluded": [
+        "Printing and production",
+        "Physical menu production or delivery"
+      ],
+      "needs": [
+        "Menu content (food and drink items, descriptions, prices)",
+        "Cafe branding assets (logo, colors, fonts) or direction to source them",
+        "Specifications for print-ready output (file format, resolution, color mode, trim/bleed settings)",
+        "Target Friday and timezone for deadline",
+        "Specific revision limit or revision process"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "revisions",
+          "prompt": "How many rounds of revisions are included? Are revisions unlimited, or is there a specific number or time limit?"
+        },
+        {
+          "sourcePhrase": "by Friday",
+          "prompt": "Which Friday and what timezone? (This determines the exact deadline.)"
+        },
+        {
+          "sourcePhrase": "print-ready files",
+          "prompt": "What file format and specifications do you need? (For example: PDF with bleed marks, InDesign source file, resolution, CMYK or RGB color mode, trim size, etc.)"
+        }
+      ],
+      "contentReview": null
+    },
+    {
+      "id": "booking-site",
+      "request": "Build a five-page website with a booking form and ongoing support.",
+      "reviewFor": [
+        "Inquiry form versus live booking and availability",
+        "Duration and boundaries of ongoing support"
+      ],
+      "quoteId": "fbe26c22-c09b-479f-a86b-30a0012259e4",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Five-page website (pages and structure pending clarification)",
+        "Booking form (fields and functionality pending clarification)",
+        "Ongoing support (scope and duration pending clarification)"
+      ],
+      "excluded": [
+        "Domain registration",
+        "Hosting setup",
+        "SSL certificate procurement",
+        "Content writing",
+        "Professional photography or imagery",
+        "Third-party integrations beyond form submission",
+        "Mobile app development"
+      ],
+      "needs": [
+        "Customer text content for all five pages, or confirmation that you will supply it",
+        "Logo and visual brand assets, or confirmation that design should be created from scratch",
+        "List of booking form fields required (e.g., name, email, date, time, service type, etc.)",
+        "Specification of file formats for final deliverable (e.g., HTML/CSS/JS, WordPress, static site generator)",
+        "Definition of 'ongoing support' scope and duration"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "five-page website",
+          "prompt": "What are the five pages and their purposes? (e.g., Home, About, Services, Contact, Booking)"
+        },
+        {
+          "sourcePhrase": "booking form",
+          "prompt": "What information must the booking form collect, and what should happen after submission? (e.g., email confirmation, calendar sync, payment processing)"
+        },
+        {
+          "sourcePhrase": "ongoing support",
+          "prompt": "What does ongoing support include and for how long? (e.g., bug fixes for 6 months, content updates, performance monitoring, emergency availability)"
+        },
+        {
+          "sourcePhrase": "booking form",
+          "prompt": "Should the form integrate with a calendar, payment processor, or email service, or just collect and store data?"
+        },
+        {
+          "sourcePhrase": "five-page website",
+          "prompt": "Will you provide all written content, images, and branding, or should these be created as part of this project?"
+        }
+      ],
+      "contentReview": null
+    },
+    {
+      "id": "logo-delivery",
+      "request": "Make a logo with revisions and all the source files. Need it ASAP.",
+      "reviewFor": [
+        "Number of revision rounds",
+        "Required editable file formats",
+        "Concrete delivery deadline"
+      ],
+      "quoteId": "f21d706c-b4a8-459a-9c84-05a6f44f7950",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Logo design (initial concept)",
+        "Revisions to logo design (pending clarification on quantity)",
+        "Source files delivery (pending clarification on formats)"
+      ],
+      "excluded": [],
+      "needs": [
+        "Specific delivery date and timezone",
+        "Number of revision rounds included",
+        "Logo purpose, style, or content direction",
+        "File formats required for source files",
+        "Target audience or brand context"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "revisions",
+          "prompt": "How many rounds of revisions are included? For example: unlimited, 2 rounds, 3 rounds?"
+        },
+        {
+          "sourcePhrase": "source files",
+          "prompt": "Which file formats do you need? For example: Photoshop (.psd), Illustrator (.ai), Figma project, editable vector file (.eps or .svg)?"
+        },
+        {
+          "sourcePhrase": "Need it ASAP",
+          "prompt": "What is your actual deadline? Please provide a specific date and timezone."
+        },
+        {
+          "sourcePhrase": "Make a logo",
+          "prompt": "What should the logo represent or communicate? Do you have a business name, industry, style preference, or visual direction in mind?"
+        }
+      ],
+      "contentReview": null
+    },
+    {
+      "id": "social-launch",
+      "request": "Create social posts with images for our launch.",
+      "reviewFor": [
+        "Number of posts",
+        "Target platforms and dimensions",
+        "Who supplies or licenses images",
+        "Launch date and delivery deadline"
+      ],
+      "quoteId": "b04a4ae4-3f11-4b7a-9f0c-3579915e7517",
+      "source": "ai",
+      "grounded": true,
+      "humanControlPreserved": true,
+      "included": [
+        "Create social media post copy",
+        "Create or source images for posts"
+      ],
+      "excluded": [
+        "Scheduling posts to social platforms",
+        "Running paid promotion campaigns",
+        "Creating video content",
+        "Designing custom graphics from scratch (pending clarification)"
+      ],
+      "needs": [
+        "Number of posts required",
+        "Which social platforms (Instagram, LinkedIn, TikTok, Twitter, etc.)",
+        "Post style preferences (tone, length, hashtag approach)",
+        "Image requirements (dimensions, quantity per post, style)",
+        "Whether images should be sourced existing stock or created new",
+        "Launch date and desired post timing",
+        "Product/service details for accurate messaging",
+        "Brand guidelines or reference examples",
+        "Revision limit",
+        "Delivery format and date"
+      ],
+      "questions": [
+        {
+          "sourcePhrase": "Create social posts with images for our launch",
+          "prompt": "How many individual posts do you need created?"
+        },
+        {
+          "sourcePhrase": "Create social posts with images for our launch",
+          "prompt": "Which social media platforms should these posts be formatted for?"
+        },
+        {
+          "sourcePhrase": "images for our launch",
+          "prompt": "Should images be sourced from existing stock photo libraries, or do you need custom graphics/photography created?"
+        },
+        {
+          "sourcePhrase": "Create social posts with images for our launch",
+          "prompt": "When is your launch date, and when do you want these posts delivered?"
+        },
+        {
+          "sourcePhrase": "for our launch",
+          "prompt": "What product or service are you launching? Please share key details, features, or brand messaging."
+        }
+      ],
+      "contentReview": null
+    }
+  ],
+  "completedAt": "2026-11-10T17:32:07.791Z"
+}

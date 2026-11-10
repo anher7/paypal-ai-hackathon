@@ -6,15 +6,21 @@ A freelancer hears “a website with a booking form.” The customer might mean 
 
 AI helps draft the agreement and compare effort with and without an AI agent. The freelancer settles the details and chooses the price. The customer reviews the approved revision. PayPal confirms payment against that exact revision and amount.
 
-[Try the hosted app](https://agree-first.tameforum1.chatgpt.site) · [Watch the 1:48 working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42851146661)
+[Try the hosted app](https://agree-first.tameforum1.chatgpt.site) · [Watch the 1:48 working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verification runs](https://github.com/anher7/paypal-ai-hackathon/actions)
 
 ![Agree First local sample workspace](docs/screenshots/home.jpg)
 
 ## Try it in your browser
 
-Open [Agree First](https://agree-first.tameforum1.chatgpt.site). No installation or application account is required. Use dummy customer details and sandbox payments only. Each browser gets its own saved workspace; keep its cookies to return to your quotes. A customer-review link currently works inside that same browser workspace. Cross-device customer sharing is future work.
+Open [Agree First](https://agree-first.tameforum1.chatgpt.site). No installation or application account is required. Use dummy customer details and sandbox payments only. Each browser gets its own saved workspace; keep its cookies to return to your quotes. After approval, choose **Create customer link** to let your customer review and pay from another browser or device. Each link grants access to one approved agreement, expires after seven days and can be closed or replaced. Changing scope or price invalidates the old link. Anyone with the link can view that agreement; keep it private. Owner editing and private effort estimates stay in your workspace.
 
 Fresh requests use the owner's hosted Astropods gateway; PayPal sandbox checkout uses the hosted server settings. Live AI has demo usage limits, and the labeled sample remains available when live integration access is unavailable. See [hosting details](docs/hosting.md). The local build below remains available for independent evaluation with your own credentials.
+
+## Why keep the agreement and payment together?
+
+An AI assistant, document and payment link can produce a good proposal. Agree First also enforces the handoff: unanswered questions block approval, scope changes invalidate the old customer link, and checkout charges only the approved server revision. The concrete outcome is a visible record of what the chosen price covers. [See the comparison](docs/value-proposition.md).
+
+A [four-case live-model evaluation](docs/model-evaluation.md) publishes both useful clarifications and content failures. [The freelancer test](docs/user-research.md) defines how to measure usefulness and comprehension; no participant results or dispute-reduction claims are invented.
 
 ## Run it on macOS or Linux
 
@@ -85,7 +91,7 @@ npm run verify
 
 `verify` runs API type checking, backend and frontend unit tests, the gateway-helper tests, a production build, and desktop/mobile browser journeys. On a Linux CI runner, use `npm run browsers:install -- --with-deps`. Browser tests need free loopback ports **3001 and 3002**. They use disposable SQLite databases and controlled providers; they never load local payment credentials or consume AI credits. The SDK/payment fixture is in `tests/support`, outside the production build.
 
-See [test coverage and live checks](docs/testing.md) and [judge instructions](docs/judging.md). The [GitHub Actions verification](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42851146661) passed on the published application revision.
+See [test coverage and live checks](docs/testing.md) and [judge instructions](docs/judging.md). See the [GitHub Actions verification runs](https://github.com/anher7/paypal-ai-hackathon/actions) and the dated [verification report](docs/verification.md) for the exact tested revisions.
 
 ## How it works
 

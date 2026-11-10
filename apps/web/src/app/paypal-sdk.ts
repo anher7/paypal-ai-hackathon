@@ -1,3 +1,5 @@
+import { InjectionToken } from '@angular/core';
+
 export interface PayPalButtons {
   render(container: HTMLElement): Promise<void>;
   close(): Promise<void>;
@@ -11,6 +13,8 @@ export interface PayPalSdk {
     onError(error: unknown): void;
   }): PayPalButtons;
 }
+
+export const PAYPAL_SDK_LOADER = new InjectionToken<typeof loadPayPalSdk>('PayPal SDK loader', { providedIn: 'root', factory: () => loadPayPalSdk });
 
 declare global { interface Window { paypal?: PayPalSdk; } }
 

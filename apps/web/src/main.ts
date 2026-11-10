@@ -11,6 +11,7 @@ bootstrapApplication(AppComponent, {
     { path: '', component: DashboardComponent },
     { path: 'quotes/:id', component: EditorComponent },
     { path: 'review/:id', component: ReviewComponent },
+    { path: 'customer', component: ReviewComponent, data: { customer: true } },
     { path: '**', redirectTo: '' },
   ])],
 }).catch((error: unknown) => console.error(error));

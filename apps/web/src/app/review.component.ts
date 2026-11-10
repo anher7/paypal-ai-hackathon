@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AppConfig, Quote } from '@agree-first/shared';
-import { catchError, EMPTY, firstValueFrom, of, switchMap, tap } from 'rxjs';
+import { AgreementView, AppConfig } from '@agree-first/shared';
+import { catchError, EMPTY, firstValueFrom, map, Observable, of, switchMap, tap } from 'rxjs';
 import { errorCode, errorMessage, QuoteApi } from './quote-api';
-import { loadPayPalSdk, PayPalButtons } from './paypal-sdk';
+import { PAYPAL_SDK_LOADER, PayPalButtons } from './paypal-sdk';
 import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } from './ui';
 
 @Component({
@@ -13,8 +14,9 @@ import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } f
   imports: [RouterLink, MatButtonModule, StatusComponent, SectionTitleComponent, MessageComponent, MoneyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="page review-page"><a routerLink="/" class="back-link">← Your work</a>
+    <div class="page review-page">@if (!customerMode) {<a routerLink="/" class="back-link">← Your work</a>}
       <div class="page-intro compact"><p class="eyebrow">Your agreement</p><h1>Review your agreement</h1><p class="intro-copy">Check the work and price below before paying.</p></div>
+      @if (customerMode) {<p class="customer-trust">This private link opens one approved agreement. You cannot change the work or price here. Ask the freelancer about anything you would like changed before paying.</p>}
       @if (message()) {<app-message [text]="message()" [error]="hasError()" />}
       @if (quote(); as current) {
         @if (current.approved; as approved) {
@@ -42,20 +44,23 @@ import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } f
                 @if (pendingCapture()) {<button mat-stroked-button type="button" (click)="retryCapture()" [disabled]="capturing() || !accepted()">{{ capturing() ? 'Checking payment…' : 'Check payment again' }}</button><p class="small-text">This checks the same PayPal order. It does not create another payment.</p>}
                 <p class="sandbox-footnote"><span class="status-dot"></span> Test money only. No real charges.</p></div>
               }
-              @if (current.status !== 'paid') {<a mat-button [routerLink]="['/quotes', current.id]" class="edit-link">← Back to editing</a>}
+              @if (!customerMode && current.status !== 'paid') {<a mat-button [routerLink]="['/quotes', current.id]" class="edit-link">← Back to editing</a>}
             </aside>
           </div>
-        } @else {<div class="paper"><h2>This quote needs your approval.</h2><p>The customer view opens after the freelancer settles the questions and approves the price.</p><a mat-flat-button [routerLink]="['/quotes', current.id]">Review the draft →</a></div>}
+        } @else {<div class="paper"><h2>{{ customerMode ? 'This agreement is not available.' : 'This quote needs your approval.' }}</h2><p>{{ customerMode ? 'Ask the freelancer for a new customer link.' : 'The customer view opens after the freelancer settles the questions and approves the price.' }}</p>@if (!customerMode) {<a mat-flat-button [routerLink]="['/quotes', current.id]">Review the draft →</a>}</div>}
       } @else if (!hasError()) {<p role="status">Opening the agreement…</p>}
     </div>
   `,
 })
 export class ReviewComponent {
   private readonly api = inject(QuoteApi);
+  private readonly loadPayPal = inject(PAYPAL_SDK_LOADER);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly paypalContainer = viewChild<ElementRef<HTMLElement>>('paypalContainer');
-  readonly quote = signal<Quote | null>(null);
+  readonly customerMode = this.route.snapshot?.data?.['customer'] === true;
+  private customerToken = '';
+  readonly quote = signal<AgreementView | null>(null);
   readonly config = signal<AppConfig | null>(null);
   readonly accepted = signal(false);
   readonly capturing = signal(false);
@@ -66,19 +71,27 @@ export class ReviewComponent {
   readonly hasError = signal(false);
 
   constructor() {
-    this.route.paramMap.pipe(
-      switchMap((params) => {
+    const agreementRoute = this.customerMode
+      ? this.route.fragment.pipe(map((token) => ({ id: '', token: token ?? '' })))
+      : this.route.paramMap.pipe(map((params) => ({ id: params.get('id') ?? '', token: '' })));
+    agreementRoute.pipe(
+      switchMap(({ id, token }) => {
         this.accepted.set(false); this.pendingCapture.set(null); this.recoveryChecked.set(false); this.quote.set(null);
-        return this.api.get(params.get('id') ?? '').pipe(switchMap((quote) => {
+        this.message.set(''); this.hasError.set(false); this.capturing.set(false); this.customerToken = token;
+        if (this.customerMode && !/^[a-f0-9]{64}$/.test(token)) {
+          this.hasError.set(true); this.message.set('This customer link is incomplete. Ask the freelancer to send the full link.'); return EMPTY;
+        }
+        return this.loadAgreement(id).pipe(switchMap((quote) => {
           this.quote.set(quote);
-          const recovery = quote.status === 'paid' || !quote.approved ? of(null) : this.api.recovery(quote.id);
+          const recovery = quote.status === 'paid' || !quote.approved ? of(null)
+            : this.customerMode ? this.api.customerRecovery(token) : this.api.recovery(quote.id);
           return recovery.pipe(tap((pending) => {
             if (pending) { this.pendingCapture.set({ orderId: pending.orderId, revision: pending.approvedRevision }); }
             this.recoveryChecked.set(true);
-          }), catchError((error: unknown) => { this.fail(error); return EMPTY; }));
-        }));
+          }));
+        }), catchError((error: unknown) => { this.fail(error); return EMPTY; }));
       }), takeUntilDestroyed(),
-    ).subscribe({ error: (error: unknown) => this.fail(error) });
+    ).subscribe();
     this.api.config().pipe(takeUntilDestroyed()).subscribe({ next: (config) => this.config.set(config), error: (error: unknown) => this.fail(error) });
     effect((onCleanup) => {
       const container = this.paypalContainer()?.nativeElement;
@@ -89,38 +102,55 @@ export class ReviewComponent {
       let disposed = false;
       let buttons: PayPalButtons | null = null;
       const approvedRevision = quote.approved.revision;
+      const token = this.customerToken;
+      const isCurrent = () => !disposed && token === this.customerToken && this.quote()?.id === quote.id;
       this.checkoutLoading.set(true);
       onCleanup(() => { disposed = true; if (buttons) { void buttons.close().catch(() => undefined); } });
-      void loadPayPalSdk(config.paypalClientId).then(async (paypal) => {
-        if (disposed) { return; }
+      void this.loadPayPal(config.paypalClientId).then(async (paypal) => {
+        if (!isCurrent()) { return; }
         buttons = paypal.Buttons({
           style: { layout: 'vertical', shape: 'rect', label: 'pay' },
           createOrder: async () => {
-            if (disposed || !this.accepted()) { throw new Error('Confirm the agreement before checkout.'); }
+            if (!isCurrent() || !this.accepted()) { throw new Error('Confirm the agreement before checkout.'); }
             this.message.set(''); this.hasError.set(false);
             try {
-              const order = await firstValueFrom(this.api.order(quote.id, approvedRevision).pipe(takeUntilDestroyed(this.destroyRef)));
+              const order = await firstValueFrom(this.createOrder(quote.id, approvedRevision, token).pipe(takeUntilDestroyed(this.destroyRef)));
+              if (!isCurrent() || !this.accepted()) { throw new Error('The agreement changed. Open its current checkout before continuing.'); }
               return order.orderId;
             } catch (error: unknown) {
-              if (errorCode(error) === 'QUOTE_PAID' && !disposed) {
-                const paid = await firstValueFrom(this.api.get(quote.id).pipe(takeUntilDestroyed(this.destroyRef)));
-                if (!disposed) { this.quote.set(paid); this.message.set('PayPal has already confirmed payment. Your receipt is up to date.'); this.hasError.set(false); }
+              if (errorCode(error) === 'QUOTE_PAID' && isCurrent()) {
+                const paid = await firstValueFrom(this.loadAgreement(quote.id, token).pipe(takeUntilDestroyed(this.destroyRef)));
+                if (isCurrent()) { this.quote.set(paid); this.message.set('PayPal has already confirmed payment. Your receipt is up to date.'); this.hasError.set(false); }
               }
               throw error;
             }
           },
           onApprove: async ({ orderID }) => {
-            if (disposed) { return; }
+            if (!isCurrent()) { return; }
             this.pendingCapture.set({ orderId: orderID, revision: approvedRevision });
-            await this.capturePayment(quote.id, orderID, approvedRevision);
+            await this.capturePayment(quote.id, orderID, approvedRevision, token);
           },
-          onCancel: () => { if (!disposed) { this.hasError.set(false); this.message.set('Checkout cancelled. Your quote is still unpaid and ready when you are.'); } },
-          onError: (error: unknown) => { if (!disposed && this.quote()?.status !== 'paid') { this.fail(error); } },
+          onCancel: () => { if (isCurrent()) { this.hasError.set(false); this.message.set('Checkout cancelled. Your quote is still unpaid and ready when you are.'); } },
+          onError: (error: unknown) => { if (isCurrent() && this.quote()?.status !== 'paid') { this.fail(error); } },
         });
         await buttons.render(container);
-        if (!disposed) { this.checkoutLoading.set(false); }
-      }).catch((error: unknown) => { if (!disposed) { this.checkoutLoading.set(false); this.fail(error); } });
+        if (isCurrent()) { this.checkoutLoading.set(false); }
+      }).catch((error: unknown) => { if (isCurrent()) { this.checkoutLoading.set(false); this.fail(error); } });
     });
+  }
+
+  private loadAgreement(id: string, token = this.customerToken): Observable<AgreementView> {
+    return this.customerMode ? this.api.customer(token) : this.api.get(id).pipe(map(({ id, status, payment, approved }) => {
+      if (!approved) { return { id, status, payment, approved: null }; }
+      const { request: _request, ...snapshot } = approved;
+      return { id, status, payment, approved: snapshot };
+    }));
+  }
+  private createOrder(id: string, revision: number, token: string) {
+    return this.customerMode ? this.api.customerOrder(token, revision) : this.api.order(id, revision);
+  }
+  private captureOrder(id: string, orderId: string, revision: number, token: string): Observable<AgreementView> {
+    return this.customerMode ? this.api.customerCapture(token, orderId, revision) : this.api.capture(id, orderId, revision);
   }
 
   printAgreement(): void { window.print(); }
@@ -129,24 +159,31 @@ export class ReviewComponent {
     const quote = this.quote();
     const pending = this.pendingCapture();
     if (!quote || !pending || !this.accepted() || this.capturing()) { return; }
-    void this.capturePayment(quote.id, pending.orderId, pending.revision);
+    void this.capturePayment(quote.id, pending.orderId, pending.revision, this.customerToken);
   }
 
-  private async capturePayment(quoteId: string, orderId: string, revision: number): Promise<void> {
+  private async capturePayment(quoteId: string, orderId: string, revision: number, token: string): Promise<void> {
+    if (token !== this.customerToken || this.quote()?.id !== quoteId || !this.accepted()) { return; }
     this.capturing.set(true);
     try {
-      const paid = await firstValueFrom(this.api.capture(quoteId, orderId, revision).pipe(takeUntilDestroyed(this.destroyRef)));
-      if (this.destroyRef.destroyed || this.quote()?.id !== quoteId) { return; }
+      const paid = await firstValueFrom(this.captureOrder(quoteId, orderId, revision, token).pipe(takeUntilDestroyed(this.destroyRef)));
+      if (this.destroyRef.destroyed || this.quote()?.id !== quoteId || token !== this.customerToken) { return; }
       this.quote.set(paid); this.pendingCapture.set(null);
       this.message.set('PayPal confirmed the sandbox payment.'); this.hasError.set(false);
     } catch (error: unknown) {
-      if (!this.destroyRef.destroyed && this.quote()?.id === quoteId) { this.fail(error); }
+      if (!this.destroyRef.destroyed && this.quote()?.id === quoteId && token === this.customerToken) { this.fail(error); }
     } finally {
-      if (!this.destroyRef.destroyed) { this.capturing.set(false); }
+      if (!this.destroyRef.destroyed && token === this.customerToken) { this.capturing.set(false); }
     }
   }
   setAccepted(event: Event): void { this.accepted.set((event.target as HTMLInputElement).checked); }
-  private fail(error: unknown): void { this.hasError.set(true); this.message.set(errorMessage(error)); }
+  private fail(error: unknown): void {
+    this.hasError.set(true);
+    if (this.customerMode && error instanceof HttpErrorResponse && [401, 403, 404, 410].includes(error.status)) {
+      this.quote.set(null); this.accepted.set(false); this.pendingCapture.set(null);
+      this.message.set('This customer link has expired, been closed, or the agreement has changed. Ask the freelancer for a new link.');
+    } else { this.message.set(errorMessage(error)); }
+  }
 }
 
 

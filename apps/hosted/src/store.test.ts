@@ -186,6 +186,22 @@ describe('hosted quote persistence', () => {
     await saved.close();
   });
 
+  it('fences stale grant rotation and revocation after a newer worker takes the quote lease', async () => {
+    const { db, connection } = database();
+    await seed(db);
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(1_000_000);
+    const stale = await openHostedStore(db, 'workspace-a', 'quote-1', true);
+    clock.mockReturnValue(1_180_001);
+    const current = await openHostedStore(db, 'workspace-a', 'quote-1', true);
+    await current.saveCustomerGrant({ tokenHash: 'current-token-hash', approvedRevision: 1, expiresAt: 9_000_000 });
+    await expect(stale.saveCustomerGrant({ tokenHash: 'stale-token-hash', approvedRevision: 1, expiresAt: 9_000_000 }))
+      .rejects.toMatchObject({ code: 'QUOTE_CHANGED' });
+    await expect(stale.revokeCustomerGrant()).rejects.toMatchObject({ code: 'QUOTE_CHANGED' });
+    expect(connection.prepare('SELECT token_hash FROM hosted_customer_grants').get()).toEqual({ token_hash: 'current-token-hash' });
+    await expect(stale.close()).rejects.toMatchObject({ code: 'QUOTE_CHANGED' });
+    await current.close();
+  });
+
   it('enforces the 20 quote limit atomically for two concurrent create sessions', async () => {
     const { db, connection } = database();
     for (let index = 0; index < 19; index += 1) await seed(db, 'workspace-a', `quote-${index}`);

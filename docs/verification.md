@@ -6,17 +6,17 @@ Verified locally on macOS ARM64 with Node 22.23.3.
 | --- | --- |
 | API type checking | Pass |
 | Backend unit tests | 114 passed |
-| Angular frontend tests | 25 passed |
+| Angular frontend tests | 36 passed |
 | Gateway connection tests | 25 passed |
 | Portable CLI setup tests | 7 passed |
 | Desktop browser journeys | 16 passed |
 | Mobile Chromium browser journeys | 16 passed |
-| Hosted persistence/API tests | 26 passed |
+| Hosted persistence/API tests | 36 passed |
 | Production build | Pass |
 | npm dependency audit | 0 reported advisories |
 | Whitespace/diff check | Pass |
 
-Total: **229 passing tests in the final complete `npm run verify` run** (10 November 2026). Type checking, all unit/connection/installer tests, production build and all 32 browser journeys passed together using Playwright’s standard browser cache. The revised desktop design was visually inspected. Mobile layout, consent, approval and payment workflows passed the Chromium browser suite. Earlier mobile and print screenshots are historical evidence from before the typography revision.
+Total: **250 passing tests in the final complete `npm run verify` run** (10 November 2026). Type checking, all unit/connection/installer tests, production build and all 32 browser journeys passed together using Playwright’s standard browser cache. The revised desktop design was visually inspected. Mobile layout, consent, approval and payment workflows passed the Chromium browser suite. Earlier mobile and print screenshots are historical evidence from before the typography revision.
 
 The browser payment integration runs the real API and SQLite with a test-only provider and SDK fixture. It covers consent, exact stored totals, receipt persistence, paid immutability, duplicate payments, amount mismatches, timeout recovery, cancellation and SDK failure. No real-money payment was attempted. The fixture is excluded from the production application.
 
@@ -50,3 +50,14 @@ Worker compatibility regressions cover missing global Buffer and unsupported red
 ## Public demo abuse controls
 
 The final full verification run passed 229 tests, builds and typechecks together. Eleven new hosted checks exercise atomic concurrent quotas, cookie resets, IP limits across minutes, the persistent total across UTC days and cleanup, invalid/stale/foreign quote requests, and availability of sample drafting and payment recovery after AI exhaustion. The runtime reserves at most two live AI calls per IP per minute, 12 per IP per UTC day, eight per browser workspace per day, 40 globally per day and 200 across the demo lifetime. Limits are configurable within server-enforced bounds. A dedicated owner-approved Astropods account key replaces the expiring development key and is kept only in private Sites server secrets. No billing settings were changed.
+
+
+## Customer links and judge-focused upgrade
+
+All250tests, builds and typechecks passed together after customer sharing was added. The hosted tests include digest-only grants, seven-day expiry, exact approved-revision projection without owner cookies, rotation, revocation, revision invalidation, denied owner actions, customer consent, payment recovery and concurrent capture versus owner changes. Frontend checks bind each SDK callback to its original agreement and token, preventing late callbacks from acting on another customer link.
+
+Sites version6 deployed the feature. A fresh public HTTP journey with no owner cookie reviewed one approved agreement, verified private fields were absent, created real sandbox order51208187A0835122G, reused it on retry, invalidated the link after scope/price edits, kept it invalid after reapproval, issued a replacement showing the newprice, and revoked it. No capture occurred on that new order. Existing provider-confirmed hosted EUR1 capture5P109687BL8079107 remains separate evidence of real payment completion.
+
+Actual browser use also recorded a separate labeled sample website agreement changing from EUR450 inquiry-only work to EUR650 with live calendar availability. The old customer link stopped opening, and the new approved link showed the changed scope and total. Tokens visible in footage were revoked after recording. The customer page was checked at390px without horizontal overflow or owner editing links.
+
+Four predefined briefs were run once before and once after a drafting-instruction correction. All eight responses preserved source-phrase grounding and human price/approval control. Content review records both improvements and remaining ambiguity in [model evaluation](model-evaluation.md). These are synthetic developer checks, not user research or proof of business outcomes.

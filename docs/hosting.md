@@ -8,7 +8,11 @@ The cloud build preserves the Angular interface and quote/payment service. A Clo
 
 Each browser receives a random Secure, HttpOnly, SameSite=Lax cookie. The database stores a SHA-256 workspace identifier; every quote read and write checks this identifier. Visitors cannot list, read or change another workspace's quotes. Reopening the app in the same browser restores its workspace. Clearing cookies loses access to that demo workspace. The demo is intended for dummy information and supports 20 quotes per workspace.
 
-Customer review currently runs in the same browser workspace. Sending a review URL to another browser does not grant access; authenticated customer sharing remains future work.
+The owner review URL stays private to its browser workspace. After approval, the owner can create a customer link that works independently on another browser or device. A link grants only the approved agreement, receipt and exact-revision sandbox checkout/recovery actions. It cannot list quotes, edit terms, see private effort estimates or run AI.
+
+Customer links contain 256 random bits in the URL fragment. The fragment is not sent in the page request, and the app uses the token only as an Authorization header to fixed customer API routes. D1 stores its SHA-256 digest, bound to the owner workspace, quote and approved revision. Raw requests and private estimates are excluded from customer responses. Links expire after seven days; issuing a replacement or closing a link invalidates the old token. Saving scope or price changes invalidates its revision. Quote leases serialize link changes and payment mutations, with grant revalidation before provider calls.
+
+Link possession grants access to that agreement; it is not proof of identity or a digital signature. Share only dummy agreements in the demo. The independent local build retains same-browser review; customer sharing is enabled by the hosted configuration.
 
 ## Payment and AI
 

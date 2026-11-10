@@ -15,6 +15,43 @@ describe('QuoteApi', () => {
   });
   afterEach(() => requests.verify());
 
+  it('keeps customer capabilities in Authorization headers and never sends an owner id or amount', async () => {
+    const token = 'a'.repeat(64);
+    const view = { id: 'quote-example', status: 'ready', approved: null, payment: null };
+    const read = firstValueFrom(api.customer(token));
+    const request = requests.expectOne('/api/customer');
+    expect(request.request.method).toBe('GET');
+    expect(request.request.headers.get('Authorization')).toBe(`Bearer ${token}`);
+    expect(request.request.urlWithParams).not.toContain(token);
+    request.flush(view); await read;
+    const recovery = firstValueFrom(api.customerRecovery(token));
+    const recoveryRequest = requests.expectOne('/api/customer/checkout-recovery');
+    expect(recoveryRequest.request.headers.get('Authorization')).toBe(`Bearer ${token}`);
+    recoveryRequest.flush(null); await recovery;
+    const order = firstValueFrom(api.customerOrder(token, 3));
+    const orderRequest = requests.expectOne('/api/customer/orders');
+    expect(orderRequest.request.body).toEqual({ approvedRevision: 3, scopeAccepted: true });
+    expect(orderRequest.request.headers.get('Authorization')).toBe(`Bearer ${token}`);
+    orderRequest.flush({ orderId: 'ORDER-1', revision: 3 }); await order;
+    const capture = firstValueFrom(api.customerCapture(token, 'ORDER-1', 3));
+    const captureRequest = requests.expectOne('/api/customer/orders/ORDER-1/capture');
+    expect(captureRequest.request.body).toEqual({ approvedRevision: 3, scopeAccepted: true });
+    expect(captureRequest.request.headers.get('Authorization')).toBe(`Bearer ${token}`);
+    captureRequest.flush(view); await capture;
+  });
+
+  it('creates and revokes owner links only for the expected saved revision', async () => {
+    const share = firstValueFrom(api.share('quote-example', 3));
+    const request = requests.expectOne('/api/quotes/quote-example/share');
+    expect(request.request.body).toEqual({ expectedRevision: 3 });
+    expect(request.request.headers.has('Authorization')).toBe(false);
+    request.flush({ token: 'a'.repeat(64), revision: 3, expiresAt: '2026-11-17T12:00:00Z' }); await share;
+    const revoke = firstValueFrom(api.revokeShare('quote-example', 3));
+    const revokeRequest = requests.expectOne('/api/quotes/quote-example/share/revoke');
+    expect(revokeRequest.request.body).toEqual({ expectedRevision: 3 });
+    revokeRequest.flush({ revoked: true }); await revoke;
+  });
+
   it('sends the approved revision and scope consent without a client amount', async () => {
     const response = firstValueFrom(api.order('quote-example', 3));
     const request = requests.expectOne('/api/quotes/quote-example/orders');

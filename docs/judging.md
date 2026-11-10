@@ -4,7 +4,7 @@ Platform: desktop browser; responsive mobile layout. Run locally with Node 22.23
 
 Public hosted demo: https://agree-first.tameforum1.chatgpt.site
 
-No installation or application login is required for the hosted demo. Use dummy details. Each browser keeps an isolated workspace in durable cloud storage, accessed through its Secure HttpOnly cookie. Keep the same browser for the editor, customer review and receipt; a review URL alone does not grant another browser access. Hosted AI has bounded demo usage limits. The local build is an independent fallback with your own integration credentials.
+No installation or application login is required for the hosted demo. Use dummy details. Each browser keeps an isolated workspace in durable cloud storage, accessed through its Secure HttpOnly cookie. Keep the same browser for owner editing. After approval, choose Create customer link and open the private link in another browser to review and pay independently. The customer cannot access owner editing or private estimates. The link expires after seven days and can be closed or replaced. Hosted AI has bounded demo usage limits. The local build is an independent fallback with your own integration credentials.
 
 Follow the root README's setup and walkthrough. No application login is required. Use dummy names and requests. In the local build, data stays in the local SQLite file.
 
@@ -21,9 +21,11 @@ No secrets belong in the public repository. Obtain sandbox app/buyer credentials
 2. Question linked to a literal phrase in the original request.
 3. AI-generated scope remains editable; final total remains a human choice.
 4. Customer view matches the approved snapshot exactly.
-5. Editing unpaid scope invalidates the old approval.
+5. Editing unpaid scope invalidates the old approval and its customer link; reapproval does not reactivate an old link. Create a new link for the new agreement.
 6. PayPal order uses the stored amount and quote revision.
 7. Verified completed capture creates a persistent, read-only receipt.
 8. Timeout recovery reuses the same order and asks for customer confirmation again.
+9. Close a customer link and reload it in the customer browser. It must show an unavailable message without owner controls.
+10. Compare the [value proposition](value-proposition.md), [live-model results](model-evaluation.md) and [research plan](user-research.md). Synthetic tests are not user-impact measurements.
 
 The browser payment integration fixture uses controlled test providers. It is test evidence, not proof of a real PayPal transaction. Fresh external-service evidence is recorded separately in the review checklist after it actually happens.

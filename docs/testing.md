@@ -12,6 +12,7 @@ Run `npm run browsers:install`, then `npm run verify` on Node 22.23.3. Local tes
 | Payment service | Consent, revision/amount/currency/recipient mismatch, duplicate requests, uncertain capture, reload recovery, expired attempts |
 | Editor browser journeys | Request creation, sample/manual drafting, phrase focus, question add/edit/remove after repeated saves, approval, dashboard persistence |
 | Checkout browser integration | Real API + SQLite with test-only provider; consent, capture, receipt reload, duplicate payment, lock, mismatch, timeout recovery, cancel, SDK failure |
+| Customer sharing | Guest access without owner cookie, hash-only grants, minimal projection, expiry, rotation, revocation, stale revisions, scoped checkout/recovery and stale SDK callbacks |
 | Layout | Desktop and mobile Chromium, horizontal overflow checks, print controls and agreement visibility |
 | Hosted abuse controls | Atomic concurrent limits, cookie resets, IP burst/day caps, lifetime cap across days and cleanup, no AI budget consumed by invalid/foreign requests, recovery after exhaustion |
 | Gateway connector | Helper ownership, disabled interfaces, credential expiry, safe error messages and cleanup |

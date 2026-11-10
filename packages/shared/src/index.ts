@@ -147,6 +147,17 @@ export interface AppConfig {
   aiConfigured?: boolean;
   aiModel?: string | null;
   localOnly: boolean;
+  customerSharing?: boolean;
+}
+
+export type AgreementView = Pick<Quote, 'id' | 'status' | 'payment'> & {
+  approved: Omit<ApprovalSnapshot, 'request'> | null;
+};
+
+export interface CustomerLink {
+  token: string;
+  expiresAt: string;
+  revision: number;
 }
 
 export interface OrderResult {
