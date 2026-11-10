@@ -4,7 +4,7 @@ Project: Agree First
 
 Tagline: Agree on the scope before you get paid.
 
-[Try Agree First](https://agree-first.tameforum1.chatgpt.site) · [Watch the working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs)
+[Try Agree First](https://agree-first.tameforum1.chatgpt.site) · [Watch the working demo](https://www.youtube.com/watch?v=JaBNFLG-2V0)
 
 ## The problem
 
@@ -38,7 +38,7 @@ Angular 22 and Material provide the interface. A Cloudflare Worker and D1 run th
 
 A small, developer-run live-model evaluation uses four predefined briefs and publishes the outputs and review rubric. It exposed a draft that incorrectly excluded requested support, which led to clearer instructions about preserving requested work pending clarification. This is engineering evidence, not user research or proof of fewer disputes.
 
-The video shows actual application use, live drafting and estimation, human decisions, PayPal checkout and a verified receipt. The labeled predefined sample is separate from live AI.
+The 2:16 video shows actual application use, live drafting and estimation, human decisions, PayPal checkout and a verified receipt. A separate labeled website example shows customer sharing, scope and price changes, the old link being blocked and the replacement agreement. That predefined example is separate from the live AI and does not include a new payment.
 
 ## What we learned and what comes next
 

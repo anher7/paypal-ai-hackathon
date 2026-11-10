@@ -38,7 +38,7 @@ The earlier narrated tour was replaced with a fresh **1:48 workflow recording**.
 
 The final video decoded completely without error; action and receipt frames were visually inspected, and narration was checked by local speech recognition. The final export stays below three minutes.
 
-The owner renamed the existing Zpower channel to **Anher Builds** (`@AnherBuilds`). The approved 1:48 demo was uploaded there and made **Public** at the owner's request. YouTube confirmed publication with no copyright issues, and watch-page playback was checked. The submission now uses `https://www.youtube.com/watch?v=zGF5sLGDTYs`.
+The owner renamed the existing Zpower channel to **Anher Builds** (`@AnherBuilds`). The approved 1:48 demo was uploaded there and made **Public** at the owner's request. YouTube confirmed publication with no copyright issues, and watch-page playback was checked. That earlier submission video remains public as historical evidence.
 
 ## Hosted verification
 
@@ -61,3 +61,10 @@ Sites version6 deployed the feature. A fresh public HTTP journey with no owner c
 Actual browser use also recorded a separate labeled sample website agreement changing from EUR 450 inquiry-only work to EUR 650 with live calendar availability. The old customer link stopped opening, and the new approved link showed the changed scope and total. Tokens visible in footage were revoked after recording. The customer page was checked at 390 px without horizontal overflow or owner editing links.
 
 Four predefined briefs were run once before and once after a drafting-instruction correction. All eight responses preserved source-phrase grounding and human price/approval control. Content review records both improvements and remaining ambiguity in [model evaluation](model-evaluation.md). These are synthetic developer checks, not user research or proof of business outcomes.
+
+
+## Published customer-sharing demo (10 November 2026)
+
+The owner approved the revised 2:16 demo and YouTube upload terms. The [new public Anher Builds video](https://www.youtube.com/watch?v=JaBNFLG-2V0) keeps the recorded live-AI and provider-confirmed cafe-menu sandbox capture, changes the opening narration, and appends actual customer sharing and scope-change actions on a separate labeled predefined website quote. The added example makes no new payment. Filmed customer-link tokens were revoked after recording. The local audio and video streams last 136.23 seconds, decode completely, and include an inspected final frame. YouTube reported no copyright issues, confirmed publication, and played the 136.261-second transcode on its watch page. Synthetic narration is disclosed in the description and YouTube AI-use setting.
+
+The new video URL, story and testing instructions were saved in Devpost and read back successfully. The rendered preview shows the new embedded video and INCOMPLETE SUBMISSION. Final terms remain unchecked and no hackathon entry was submitted.

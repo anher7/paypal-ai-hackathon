@@ -11,10 +11,10 @@ Deadline: **12 November 2026 at 12:00 PST / 20:00 UTC / 21:00 Amsterdam / 23:00 
 | Requirement | State / evidence |
 | --- | --- |
 | Working PayPal sandbox + AI application | Fresh live drafting/estimation and EUR 1.00 completed sandbox capture verified |
-| Functional build and complete run instructions | README and judge walkthrough; 195 local tests and remote verification passed |
+| Functional build and complete run instructions | README and judge walkthrough; 250 local tests and remote verification passed |
 | Feature description | `docs/submission.md` ready to paste into Devpost |
 | Public open-source repository | [https://github.com/anher7/paypal-ai-hackathon](https://github.com/anher7/paypal-ai-hackathon); GitHub detects MIT; anonymous access verified |
-| Public YouTube demo under three minutes | [1:48 demo](https://www.youtube.com/watch?v=zGF5sLGDTYs); public publication confirmed and playback checked |
+| Public YouTube demo under three minutes | [2:16 demo](https://www.youtube.com/watch?v=JaBNFLG-2V0); public publication confirmed and playback checked |
 | English submission materials | Complete |
 | Entrant details and free judging access | Owner confirms these in the final submission |
 
