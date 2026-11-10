@@ -5,7 +5,7 @@ export const examples: ExampleRequest[] = [{
   title: 'A website for a small studio',
   customerName: 'Mira Studio',
   request: 'Build a five-page website with a booking form.',
-  description: 'An example draft with one small phrase that could mean very different work.',
+  description: 'Sample data. Review whether the booking form sends an inquiry or manages availability.',
 }];
 
 export const exampleDraftProvider: DraftProvider = {

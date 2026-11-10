@@ -16,11 +16,11 @@ import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } f
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="page dashboard-page">
-      <div class="page-intro"><p class="eyebrow">THE AGREEMENT NOTEBOOK</p><h1>Your work<span class="brand-period">.</span></h1><p class="intro-copy">A vague request is a starting point.<br>Turn it into work you both understand.</p></div>
+      <div class="page-intro"><p class="eyebrow">For freelancers and small studios</p><h1>Get the scope agreed before you get paid.</h1><p class="intro-copy">Turn a customer request into a quote that spells out the work, the price and what’s not included.</p></div>
       @if (message()) {<app-message [text]="message()" [error]="hasError()" />}
       <div class="dashboard-grid">
         <section class="paper new-quote-panel">
-          <app-section-title number="01" title="Start with their words" hint="Paste the request. The price comes later." />
+          <app-section-title number="01" title="Create a quote" hint="Start with the customer’s request. Set the price after reviewing the scope." />
           <form [formGroup]="form" (ngSubmit)="createQuote()">
             <mat-form-field appearance="outline"><mat-label>Work title</mat-label><input matInput formControlName="title" maxlength="160" placeholder="A website for a local studio">@if (form.controls.title.invalid) {<mat-error>Add a short title.</mat-error>}</mat-form-field>
             <mat-form-field appearance="outline"><mat-label>Customer name</mat-label><input matInput formControlName="customerName" maxlength="160" placeholder="Who is asking?">@if (form.controls.customerName.invalid) {<mat-error>Add a customer name.</mat-error>}</mat-form-field>
@@ -29,9 +29,9 @@ import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } f
           </form>
         </section>
         <aside class="example-panel">
-          <span class="example-tab">TRY THE FLOW</span><p class="eyebrow">A CLEARLY LABELED EXAMPLE</p>
-          <h2>“Booking form”<br>can mean two things.</h2>
-          <p>An inquiry form? A live calendar? Find the question before it becomes extra work.</p>
+          <span class="example-tab">Try an example</span><p class="eyebrow">Sample request</p>
+          <h2>What does “booking form” include?</h2>
+          <p>An email form and a live booking calendar are different jobs. Clear up the difference before agreeing on a price.</p>
           @for (example of examples(); track example.id) {
             <blockquote>{{ example.request }}</blockquote><p class="small-text">{{ example.description }}</p>
             <button mat-stroked-button type="button" (click)="useExample(example)" [disabled]="busy()">Use this example →</button>
@@ -41,8 +41,8 @@ import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } f
       </div>
       <section class="saved-work">
         <div class="work-heading"><app-section-title number="02" title="Your saved quotes" /><span class="small-text">{{ quotes().length }} {{ quotes().length === 1 ? 'quote' : 'quotes' }}</span></div>
-        @if (loading()) {<p role="status" class="empty-state">Opening your notebook…</p>}
-        @else if (quotes().length === 0) {<div class="empty-state"><span class="empty-symbol">↗</span><div><h3>Your first agreement starts above.</h3><p>Saved quotes will appear here, ready for the next step.</p></div></div>}
+        @if (loading()) {<p role="status" class="empty-state">Loading quotes…</p>}
+        @else if (quotes().length === 0) {<div class="empty-state"><span class="empty-symbol">↗</span><div><h3>No quotes yet.</h3><p>Create a quote above or try the sample request.</p></div></div>}
         @else {<div class="quote-list">@for (quote of quotes(); track quote.id) {
           <a [routerLink]="quote.status === 'paid' ? ['/review', quote.id] : ['/quotes', quote.id]" class="quote-row"><div><span class="small-text">{{ quote.customerName }}</span><h3>{{ quote.title }}</h3></div><app-status [status]="quote.status" /><strong class="quote-price">{{ quote.priceCents | money }}</strong><span class="row-arrow" aria-hidden="true">↗</span></a>
         }</div>}

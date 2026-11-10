@@ -17,5 +17,5 @@ test-results/
 *.sqlite-wal
 *.log
 
-AGENTS.md
-/temp
+[Aa][Gg][Ee][Nn][Tt][Ss].[Mm][Dd]
+temp/

@@ -15,29 +15,66 @@
             "browser": "src/main.ts",
             "index": "src/index.html",
             "tsConfig": "tsconfig.app.json",
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss"
+            ],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              }
+            ]
           },
           "configurations": {
-            "production": {"outputHashing": "all", "budgets": [{"type": "initial", "maximumWarning": "1MB", "maximumError": "2MB"}]},
-            "development": {"optimization": false, "sourceMap": true}
+            "production": {
+              "outputHashing": "all",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                }
+              ]
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true
+            }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": {"proxyConfig": "proxy.conf.json", "prebundle": {"exclude": ["@agree-first/shared"]}},
+          "options": {
+            "proxyConfig": "proxy.conf.json",
+            "prebundle": {
+              "exclude": [
+                "@agree-first/shared"
+              ]
+            }
+          },
           "configurations": {
-            "development": {"buildTarget": "agree-first:build:development"},
-            "production": {"buildTarget": "agree-first:build:production"}
+            "development": {
+              "buildTarget": "agree-first:build:development"
+            },
+            "production": {
+              "buildTarget": "agree-first:build:production"
+            }
           },
           "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular/build:unit-test",
-          "options": {"tsConfig": "tsconfig.spec.json", "runner": "vitest"}
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "runner": "vitest"
+          }
         }
       }
     }
   },
-  "cli": {"analytics": false}
+  "cli": {
+    "analytics": false
+  }
 }

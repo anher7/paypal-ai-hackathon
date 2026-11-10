@@ -26,7 +26,7 @@ describe('Work estimate comparison', () => {
     const button = fixture.nativeElement.querySelector('[aria-label="Use high suggestion with an ai agent"]') as HTMLButtonElement;
     button.click();
     expect(selected).toHaveBeenCalledWith(7500);
-    expect(fixture.nativeElement.textContent).toContain('Using an agent may take more time.');
+    expect(fixture.nativeElement.textContent).toContain('AI can save time on some tasks and add work on others.');
     expect(fixture.nativeElement.textContent).toContain('Predefined example. No AI was called');
     expect(formatWorkHours(45, 90)).toBe('0.75–1.5 hours');
   });

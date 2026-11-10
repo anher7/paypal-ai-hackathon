@@ -47,7 +47,7 @@ test('live drafting estimates edited work and copies only the chosen current sug
   await page.getByLabel('Included work').fill('One two-sided print menu and print-ready PDF.');
   await page.getByLabel('Hourly rate in EUR').fill('50.00');
   await page.getByRole('button', { name: 'Estimate work', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Same work. Two ways to deliver.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Compare delivery options' })).toBeVisible();
   await expect(page.getByText('€150.00–€250.00', { exact: true })).toBeVisible();
   await expect(page.getByText('€100.00–€300.00', { exact: true })).toBeVisible();
   await expect(page.getByText('Review type, proofread and test printing.')).toBeVisible();

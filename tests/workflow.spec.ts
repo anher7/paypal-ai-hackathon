@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 async function openExample(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: 'Use this example' }).click();
-  await expect(page.getByRole('heading', { name: 'Make the work clear' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Review the scope' })).toBeVisible();
 }
 
 async function resolveExample(page: Page, price = '450.50') {
@@ -25,7 +25,7 @@ test('question-linked scope needs an answer, then shows the exact approved price
   await expect(page.getByRole('button', { name: 'Approve scope & price' })).toBeDisabled();
   await resolveExample(page);
   await page.getByRole('link', { name: 'Customer view' }).click();
-  await expect(page.getByRole('heading', { name: 'Here’s what we agree' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Review your agreement' })).toBeVisible();
   await expect(page.getByText('An inquiry form only. Live calendar availability is not included.')).toBeVisible();
   await expect(page.getByText('€450.50', { exact: true })).toBeVisible();
   await expect(page.getByText('Sandbox checkout needs setup', { exact: true })).toBeVisible();
@@ -56,7 +56,7 @@ test('a new request works manually and sample drafting never claims to be live A
   await page.getByLabel('Customer name').fill('Dummy cafe');
   await page.getByLabel('Customer request').fill('Update three prices on our existing menu.');
   await page.getByRole('button', { name: 'New quote' }).click();
-  await expect(page.getByRole('heading', { name: 'Make the work clear' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Review the scope' })).toBeVisible();
   await page.getByRole('button', { name: 'Try example drafting' }).click();
   await expect(page.getByRole('alert')).toContainText('Live AI is not connected.');
   await page.getByLabel('Included work').fill('Update three menu prices supplied by the customer.');

@@ -5,6 +5,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
+import { astropodsCliPath } from './setup-ai.mjs';
+
 const executeFile = promisify(execFile);
 export const gatewayModel = 'claude-haiku-4-5';
 export class GatewayConnectionError extends Error {}
@@ -92,7 +94,7 @@ export function extractGatewayRuntime(container, cliOutput, identity, now = Date
 
 export async function connectGateway(projectDirectory, options = {}) {
   const identity = gatewayHelperIdentity(projectDirectory);
-  const cliExecutable = join(projectDirectory, '.tools', 'ast-0.29.0', 'ast.exe');
+  const cliExecutable = astropodsCliPath(projectDirectory);
   const run = options.run ?? (async (executable, args, timeout = 30_000) => {
     const result = await executeFile(executable, args, {
       cwd: identity.workingDirectory, windowsHide: true, timeout, maxBuffer: 5 * 1024 * 1024,
@@ -107,9 +109,9 @@ export async function connectGateway(projectDirectory, options = {}) {
   await writeFile(join(identity.workingDirectory, 'astropods.yml'), createGatewaySpec(identity.projectName));
   await writeFile(join(identity.workingDirectory, 'no-secrets.conf'), '');
   try { await run('docker', ['info', '--format', '{{.ServerVersion}}']); }
-  catch { throw new GatewayConnectionError('Start Docker Desktop, then run .\\scripts\\connect-ai.ps1 again.'); }
+  catch { throw new GatewayConnectionError('Start Docker Desktop, then run npm run ai:connect again.'); }
   try { await run(cliExecutable, ['whoami']); }
-  catch { throw new GatewayConnectionError('Sign in with .\\scripts\\connect-ai.ps1 -Login, then finish the code shown in your browser.'); }
+  catch { throw new GatewayConnectionError('Sign in with npm run ai:login, then finish the code shown in your browser.'); }
 
   const listHelperIds = async () => {
     const output = await run('docker', ['ps', '--all', '--filter', `label=${projectLabel}=${identity.projectName}`,
@@ -170,7 +172,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const projectDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..');
   try {
     await connectGateway(projectDirectory);
-    console.log('AI is connected. Refresh the app to use live drafting. Reconnect with .\\scripts\\connect-ai.ps1 when the development key expires.');
+    console.log('AI is connected. Refresh the app to use live drafting. Reconnect with npm run ai:connect when the development key expires.');
   } catch (error) {
     console.error(error instanceof GatewayConnectionError ? error.message : 'AI connection failed. Check Docker Desktop and your Astropods sign-in, then try again.');
     process.exitCode = 1;

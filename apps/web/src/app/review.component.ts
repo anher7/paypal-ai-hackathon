@@ -14,23 +14,24 @@ import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } f
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="page review-page"><a routerLink="/" class="back-link">← Your work</a>
-      <div class="page-intro compact"><p class="eyebrow">THE CUSTOMER VIEW</p><h1>Here’s what we agree<span class="brand-period">.</span></h1><p class="intro-copy">Clear work. One price. Read it together.</p></div>
+      <div class="page-intro compact"><p class="eyebrow">Your agreement</p><h1>Review your agreement</h1><p class="intro-copy">Check the work and price below before paying.</p></div>
       @if (message()) {<app-message [text]="message()" [error]="hasError()" />}
       @if (quote(); as current) {
         @if (current.approved; as approved) {
           <div class="review-grid">
-            <article class="paper agreement-paper"><div class="agreement-top"><p class="eyebrow">AGREEMENT / {{ approved.revision.toString().padStart(2, '0') }}</p><app-status [status]="current.status" /></div><h2 class="agreement-title">{{ approved.title }}</h2><p class="customer-line">Prepared for <strong>{{ approved.customerName }}</strong></p><div class="agreement-rule"></div>
+            <article class="paper agreement-paper"><p class="print-only">Agree First · Sandbox prototype · Test money only</p><div class="agreement-top"><p class="eyebrow">AGREEMENT / {{ approved.revision.toString().padStart(2, '0') }}</p><app-status [status]="current.status" /></div><h2 class="agreement-title">{{ approved.title }}</h2><p class="customer-line">Prepared for <strong>{{ approved.customerName }}</strong></p><div class="agreement-rule"></div>
               <section class="scope-section"><app-section-title number="01" title="You’ll get" /><ul class="scope-list">@for (item of approved.included; track $index) {<li>{{ item }}</li>}</ul></section>
               <section class="scope-section"><app-section-title number="02" title="Not included" />@if (approved.excluded.length) {<ul class="scope-list">@for (item of approved.excluded; track $index) {<li>{{ item }}</li>}</ul>} @else {<p class="small-text">No exclusions listed.</p>}</section>
               <section class="scope-section"><app-section-title number="03" title="We need from you" />@if (approved.needs.length) {<ul class="scope-list">@for (item of approved.needs; track $index) {<li>{{ item }}</li>}</ul>} @else {<p class="small-text">No customer inputs listed.</p>}</section>
-              <section class="scope-section"><app-section-title number="04" title="The details we settled" />@for (question of approved.questions; track question.id) {<div class="settled-question"><span class="settled-label" [class.assumption]="question.resolution === 'assumption'">{{ question.resolution === 'assumption' ? 'ASSUMPTION' : 'ANSWER' }}</span><h3>{{ question.prompt }}</h3><p>{{ question.response }}</p><span class="small-text">From “{{ question.sourcePhrase }}”</span></div>} @empty {<p class="small-text">No extra questions were added to this agreement.</p>}</section>
+              <section class="scope-section"><app-section-title number="04" title="Answers and assumptions" />@for (question of approved.questions; track question.id) {<div class="settled-question"><span class="settled-label" [class.assumption]="question.resolution === 'assumption'">{{ question.resolution === 'assumption' ? 'ASSUMPTION' : 'ANSWER' }}</span><h3>{{ question.prompt }}</h3><p>{{ question.response }}</p><span class="small-text">From “{{ question.sourcePhrase }}”</span></div>} @empty {<p class="small-text">No extra questions were added to this agreement.</p>}</section>
+              <button mat-stroked-button type="button" class="print-agreement" (click)="printAgreement()">Print / save agreement</button>
               <div class="agreement-signoff"><span class="handwritten-mark" aria-hidden="true">✓</span><p>Scope and price approved by the freelancer.<br><span class="small-text">Revision {{ approved.revision }} · Changes need a new approval.</span></p></div>
             </article>
-            <aside class="checkout-panel"><p class="eyebrow">ONE AGREED TOTAL</p><p class="total-price">{{ approved.priceCents | money }}</p><p class="small-text">EUR · No extra amounts added at checkout.</p><hr>
+            <aside class="checkout-panel"><p class="eyebrow">Total price</p><p class="total-price">{{ approved.priceCents | money }}</p><p class="small-text">EUR · The checkout amount matches this total.</p><hr>
               @if (current.status === 'paid' && current.payment; as receipt) {
                 <div class="paid-note"><span class="receipt-check" aria-hidden="true">✓</span><h2>Payment received.</h2><p>PayPal confirmed this sandbox payment.</p><dl class="receipt"><dt>Amount</dt><dd>{{ receipt.priceCents | money }}</dd><dt>Capture reference</dt><dd>{{ receipt.captureId }}</dd><dt>Order reference</dt><dd>{{ receipt.orderId }}</dd></dl></div>
               } @else {
-                <h2>Read. Agree. Pay.</h2><p>Check the work, exclusions, and assumptions above before continuing.</p>
+                <div class="checkout-actions"><h2>Confirm and pay</h2><p>Check the work, exclusions, and assumptions above before continuing.</p>
                 <label class="scope-confirmation"><input type="checkbox" [checked]="accepted()" (change)="setAccepted($event)" [disabled]="capturing()"><span>I agree to this scope, its assumptions, and the total price.</span></label>
                 @if (!recoveryChecked()) {<p role="status" class="small-text">Checking previous checkout…</p>}
                 @else if (!config()) {<p role="status" class="small-text">Checking sandbox checkout…</p>}
@@ -39,7 +40,7 @@ import { MessageComponent, MoneyPipe, SectionTitleComponent, StatusComponent } f
                 @else if (accepted()) {<div #paypalContainer class="paypal-container" aria-label="PayPal sandbox checkout"></div>@if (checkoutLoading()) {<p role="status" class="small-text">Loading sandbox checkout…</p>}}
                 @else {<p class="small-text">Confirm the agreement to open sandbox checkout.</p>}
                 @if (pendingCapture()) {<button mat-stroked-button type="button" (click)="retryCapture()" [disabled]="capturing() || !accepted()">{{ capturing() ? 'Checking payment…' : 'Check payment again' }}</button><p class="small-text">This checks the same PayPal order. It does not create another payment.</p>}
-                <p class="sandbox-footnote"><span class="status-dot"></span> Test money only. No real charges.</p>
+                <p class="sandbox-footnote"><span class="status-dot"></span> Test money only. No real charges.</p></div>
               }
               @if (current.status !== 'paid') {<a mat-button [routerLink]="['/quotes', current.id]" class="edit-link">← Back to editing</a>}
             </aside>
@@ -121,6 +122,8 @@ export class ReviewComponent {
       }).catch((error: unknown) => { if (!disposed) { this.checkoutLoading.set(false); this.fail(error); } });
     });
   }
+
+  printAgreement(): void { window.print(); }
 
   retryCapture(): void {
     const quote = this.quote();

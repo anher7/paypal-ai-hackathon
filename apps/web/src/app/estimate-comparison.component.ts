@@ -14,8 +14,8 @@ export function formatWorkHours(minMinutes: number, maxMinutes: number): string 
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="estimate-comparison" aria-label="Work and price estimate">
-      <div class="estimate-heading"><h3>Same work. Two ways to deliver.</h3><span class="estimate-source">{{ estimate().source === 'ai' ? 'AI suggestion' : 'Example estimate' }}</span></div>
-      <p class="small-text">These are estimates, not a promise. Both include human review, corrections, and testing. Using an agent may take more time.</p>
+      <div class="estimate-heading"><h3>Compare delivery options</h3><span class="estimate-source">{{ estimate().source === 'ai' ? 'AI suggestion' : 'Example estimate' }}</span></div>
+      <p class="small-text">Both estimates include your review, corrections and testing. AI can save time on some tasks and add work on others.</p>
       @if (stale()) {<p class="estimate-warning" role="status">The work changed. Estimate again before using a suggested price.</p>}
       @if (!hasRate()) {<p class="small-text">Add an hourly rate to see suggested prices.</p>}
       @else if (!canUse() && !stale()) {<p class="small-text">Save your hourly rate before using a suggested price.</p>}
@@ -38,7 +38,7 @@ export function formatWorkHours(minMinutes: number, maxMinutes: number): string 
     :host { display: block; margin: 22px 0 28px; }
     .estimate-comparison { border: 1px solid #cdd6c4; background: #f2f5ec; padding: 20px; }
     .estimate-heading { display: flex; flex-wrap: wrap; gap: 10px; align-items: start; justify-content: space-between; }
-    h3 { font-family: Georgia, serif; font-weight: 400; font-size: 23px; }
+    h3 { font-family: inherit; font-weight: 600; font-size: 23px; }
     h4 { margin: 0 0 10px; font-size: 15px; }
     h5 { margin: 0 0 10px; font-size: 14px; }
     .estimate-source { font-size: 10px; color: #426548; border: 1px solid #bccfb6; padding: 4px 7px; }

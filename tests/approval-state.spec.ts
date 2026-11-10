@@ -49,6 +49,7 @@ test('question edits remain live after saving and re-drafting the quote', async 
   await expect(page.locator('.approval-hint')).toContainText('Ready for your approval');
   await page.getByRole('button', { name: 'Save quote', exact: true }).click();
   await expect(page.getByText('Quote saved.', { exact: true })).toBeVisible();
+  await expect(page.getByText('Revision 4', { exact: true })).toBeVisible();
   expect(savedResponses.at(-1)).toBe('An inquiry form only; no live calendar.');
 
   await page.getByLabel('How is it settled?').selectOption('assumption');

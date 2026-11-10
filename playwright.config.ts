@@ -1,8 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import { resolve } from 'node:path';
 
-process.env.PLAYWRIGHT_BROWSERS_PATH ??= resolve('.tools/playwright');
-
 export default defineConfig({
   testDir: './tests',
   fullyParallel: false,
@@ -19,7 +17,7 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile', use: { ...devices['iPhone 13'], defaultBrowserType: 'chromium' } },
   ],
-  webServer: {
+  webServer: [{
     command: `"${process.execPath}" apps/api/dist/index.js`,
     url: 'http://127.0.0.1:3001/api/config',
     reuseExistingServer: false,
@@ -32,6 +30,11 @@ export default defineConfig({
       AGREE_FIRST_AI_MODE: 'examples',
       PORT: '3001',
     },
-  },
+  }, {
+    command: `"${process.execPath}" node_modules/tsx/dist/cli.mjs tests/support/server.ts`,
+    url: 'http://127.0.0.1:3002/api/config',
+    reuseExistingServer: false,
+    timeout: 30000,
+  }],
 });
 

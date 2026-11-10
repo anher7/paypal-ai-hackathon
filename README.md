@@ -1,205 +1,103 @@
 # Agree First
 
-Make the work clear before anyone pays.
+**Agree on the scope before you get paid.**
 
-Agree First helps a freelancer turn a customer request into a clear quote. Questions
-point back to the words that caused them. The freelancer answers them, or writes
-an assumption, enters a price, and approves the work. The customer reviews that
-same agreement before PayPal sandbox checkout.
+A freelancer hears “a website with a booking form.” The customer might mean an inquiry form, or a live scheduling system. Agree First turns that ambiguity into an explicit question, a human-reviewed scope, and one fixed price before PayPal sandbox checkout.
 
-## What works in this version
+AI helps draft the agreement and compare effort with and without an AI agent. The freelancer settles the details and chooses the price. The customer reviews the approved revision. PayPal confirms payment against that exact revision and amount.
 
-- A local quote list, an editable scope, and a customer review page.
-- Questions linked to phrases in the request.
-- Answers and explicit assumptions before approval.
-- Human-entered EUR prices and a fixed approved quote revision.
-- SQLite storage and a genuine PayPal sandbox order/capture integration.
-- Clearly labeled sample drafting for the example request.
-- Astropods live drafting for new requests when connected.
-- Task, hour, and price comparisons with and without an AI agent.
-- An editable hourly rate and explicit selection of a suggested final price.
+![Agree First local sample workspace](docs/screenshots/home.jpg)
 
-Live AI needs a gateway connection. Sample drafting is predefined and clearly labeled. Other requests can be drafted manually. Without sandbox credentials, checkout
-shows a setup message and cannot mark a quote paid.
+## Run it on macOS or Linux
 
-## Start on Windows
+Use **Node 22.23.3** and npm. If you use nvm, the repository includes `.nvmrc`:
 
-Open Windows PowerShell 5.1 or PowerShell 7 in:
-
-`C:\Users\anhur\Documents\www\paypal-ai-hackathon`
-
-```powershell
-.\scripts\setup.ps1
-.\scripts\run.ps1 dev
+```sh
+nvm install
+nvm use
+npm ci
+npm run build
+npm start
 ```
 
-Setup downloads Node 22.23.3 into `.tools/`, verifies its SHA-256 against the
-official Node manifest, and installs the dependencies. It does not change your
-system Node installation. If your PowerShell policy blocks these local scripts,
-run them in a process with an appropriate policy; the scripts do not change policy.
+Open **http://127.0.0.1:3001**. Keep the terminal running. `Ctrl+C` stops the app. Without nvm, install Node 22.23.3 from [Node.js](https://nodejs.org/download/release/v22.23.3/), then use the npm commands above. Native SQLite requires a supported Node version; reinstall with `npm ci` after changing Node.
 
-Open [Agree First](http://127.0.0.1:4200). The API runs on
-[port 3001](http://127.0.0.1:3001/api/config). Stop the development command with Ctrl+C.
+For development, `npm run dev` starts Angular on http://127.0.0.1:4200 and the API on port 3001. Do not run development and production servers together on port 3001.
 
-Use the labeled example, “Build a five-page website with a booking form.”
-Resolve “booking form,” write the agreed scope, and enter your own price. Approve
-the quote and open the customer view.
+Windows: `scripts/setup.ps1` installs a checksum-verified local Node runtime. Then run `scripts/run.ps1 dev`. See [Windows and integration details](docs/windows-and-integrations.md).
 
-## Sandbox checkout
+## Judge walkthrough: no account required for the sample
 
-Use credentials from your own PayPal developer **sandbox** application. Put only
-the two required values in a root `.env` file, beside `package.json`:
+1. Choose **Use this example**. The scope and questions are visibly labeled as predefined sample content.
+2. Follow the highlighted **booking form** phrase to its question. Approval stays disabled until it is answered or an explicit assumption is recorded.
+3. Choose **We have an answer** and enter `An inquiry form only; no live calendar.`
+4. Enter an hourly rate such as `50` and choose **Estimate work**. The sample compares the same work in both delivery approaches. Choose a suggestion explicitly, or enter your own total such as `450.50`.
+5. Choose **Approve scope & price**, then **Customer view**. Review inclusions, exclusions, customer inputs, settled details, and the exact EUR total. **Print / save agreement** opens the browser's print/PDF dialog.
+6. Without credentials, checkout displays a setup message and stays unpaid. With sandbox credentials, confirm the agreement and complete PayPal checkout using a personal sandbox buyer or a [published sandbox test card](https://developer.paypal.com/sandbox-testing/card-testing).
+7. A completed payment displays the stored order and capture references. Reload to verify persistence. Paid agreements are read-only.
+
+The sample walkthrough is deterministic and consumes no AI credits. A **fresh request** plus **Generate AI draft** is the live AI demonstration; do not present the labeled sample as a live model response.
+
+## Connect real services
+
+Copy `.env.example` to `.env` in the repository root. Never commit or share `.env`. Set:
 
 ```dotenv
-PAYPAL_CLIENT_ID=your-sandbox-client-id
-PAYPAL_CLIENT_SECRET=your-sandbox-client-secret
+PAYPAL_CLIENT_ID=your-sandbox-app-client-id
+PAYPAL_CLIENT_SECRET=your-sandbox-app-client-secret
+ASTRO_GATEWAY_URL=your-https-gateway-base-url
+ASTRO_GATEWAY_API_KEY=your-gateway-api-key
+MODEL_DEFAULT=claude-haiku-4-5
 ```
 
-The backend loads this optional file at startup. Keep it out of Git and chat.
-The assistant does not open it. The frontend receives only the public client ID;
-secrets and OAuth tokens stay on the server. Variables already set in your
-PowerShell session take precedence over the file.
+Get a sandbox application and separate personal buyer from the [PayPal Developer Dashboard](https://developer.paypal.com/dashboard/). Use sandbox credentials only. The server calls only `api-m.sandbox.paypal.com`; there is no live-money mode.
 
-Both `PAYPAL_MERCHANT_ID` and `AGREE_FIRST_DATABASE_PATH` are optional. Leave them
-out or blank to use the normal recipient check and `work/agree-first.sqlite`.
-A blank `PORT` also uses the default, 3001.
+For live AI, use the [Astropods AI gateway](https://docs.astropods.com/ai-gateway). To connect without copying credentials by hand, keep Docker Desktop running and use:
 
-After changing configuration, press Ctrl+C in the running app terminal, then run:
-
-```powershell
-.\scripts\run.ps1 dev
+```sh
+npm run ai:setup
+npm run ai:login
+npm run ai:connect
 ```
 
-Refresh the customer page and confirm the scope checkbox. Use a personal sandbox
-buyer account for checkout. The app calls only `https://api-m.sandbox.paypal.com`;
-there is no live-payment mode or simulated payment-success button.
+The setup pins Astropods CLI 0.32.0 and verifies its official SHA-256 before installation. Login prints a device URL and code; authorize it in your browser. Connect runs an isolated local helper, transfers the temporary gateway settings directly into an ignored runtime file, then stops the helper. It does not publish or deploy the project. The same commands support macOS, Linux and Windows on x64/ARM64. Existing PowerShell wrappers use the same installer; see [integration details](docs/windows-and-integrations.md).
 
+The backend reloads private runtime settings automatically; refresh the app after connecting. Manual gateway settings in `.env` or your shell take precedence over the helper file, so leave both `ASTRO_GATEWAY_URL` and `ASTRO_GATEWAY_API_KEY` blank when using the helper. Account allowance and key expiry are controlled by the provider; check them before the demo. Do not buy credits without approval.
 
-Checkout uses Pay Now for the fixed agreed total and asks for no shipping address.
-If an older popup shows Continue to review your order, close it and refresh the
-app. Save the unpaid quote and approve it again before reopening PayPal; this
-creates a fresh revision and order with the current settings. If the app asks to
-check a pending payment, use Check payment again before trying to edit the quote.
+Restart the server after editing `.env`. Run `npm run doctor` to check readiness without printing secrets or contacting providers. In the app, create a new request, choose **Generate AI draft**, settle its questions, then **Estimate work**. AI can draft and estimate; it cannot approve, change the final price automatically, or pay.
 
-Approval fixes scope, assumptions, amount, and quote revision. Edits remove unpaid
-approval. The server creates and captures the stored amount, checks the order and
-recipient, and records payment only after PayPal confirms a matching completed
-capture. It stores retry identifiers so repeating checkout cannot create a second
-capture. An uncertain capture blocks edits until its result is checked. The customer view restores that saved order after reload and requires agreement confirmation again before retrying.
+Only the public PayPal client ID is sent to the browser. OAuth tokens, client secrets and AI credentials stay on the server. Judges can use their own sandbox application and gateway credentials with the instructions above; no private repository account or paid application subscription is required to run the local sample.
 
-If an unresolved attempt is more than five hours old, the app asks for a manual
-sandbox check rather than making a new payment attempt. This is a conservative
-retry boundary, not a claim that every provider operation has the same lifetime.
+## Verify
 
-## Connect AI with Astropods
-
-Create an account through the [hackathon sponsor page](https://paypalaihackathon.devpost.com/details/astropods) and check its available credits. Keep Docker Desktop running for the local connection step. In the project PowerShell terminal, run:
-
-```powershell
-.\scripts\connect-ai.ps1 -Login
+```sh
+npm run browsers:install
+npm run verify
 ```
 
-Follow the Astropods browser link and code, then wait for the command to finish.
-The script installs a checksum-verified project-local CLI if needed. It starts a
-local helper without published ports, copies the gateway credentials internally,
-and closes the helper. It does not publish or deploy your project.
+`verify` runs API type checking, backend and frontend unit tests, the gateway-helper tests, a production build, and desktop/mobile browser journeys. On a Linux CI runner, use `npm run browsers:install -- --with-deps`. Browser tests need free loopback ports **3001 and 3002**. They use disposable SQLite databases and controlled providers; they never load local payment credentials or consume AI credits. The SDK/payment fixture is in `tests/support`, outside the production build.
 
-Refresh the app after connecting. The backend detects the new gateway settings automatically.
-Create a new unpaid quote with your own request and click Generate scope.
-The predefined example still uses labeled sample scope; it is not a live draft.
+See [test coverage and live checks](docs/testing.md) and [judge instructions](docs/judging.md). The GitHub Actions workflow runs the same verification after publication; its remote result must be checked separately.
 
-After reviewing the scope and settling questions, enter your hourly rate in EUR
-and click Estimate work. The comparison lists tasks, time ranges, agent help,
-human work, and assumptions for the same scope. Price suggestions use that rate.
-Choose Use low suggestion or Use high suggestion only if the amount fits your
-work, or enter your own final price. Approval and checkout use that one final
-amount; AI cannot approve or pay. Work edits mark estimates stale until recalculated.
-Rates can be left blank to estimate time only. Paid quotes stay read-only.
+## How it works
 
-The connection is temporary. If it expires, rerun `.\scripts\connect-ai.ps1` and
-restart the app; add `-Login` only when a fresh Astropods sign-in is needed.
-Private gateway settings stay in `.tools/astropods/gateway-runtime.json`, which
-Git ignores. Do not open, share, or commit that file. The assistant never inspects
-its contents. The documented gateway model is Claude Haiku 4.5.
+- `apps/web`: Angular 22 and Angular Material; responsive editor, effort comparison, customer review and receipt.
+- `apps/api`: Express, SQLite/Drizzle, approval rules, AI gateway and PayPal Orders v2.
+- `packages/shared`: Zod contracts, types and integer-cent money calculations.
+- `tests`: desktop/mobile workflows, including real API/storage with isolated provider fixtures.
 
-Requests have a timeout, bounded output, strict validation, and no automatic
-retry. AI time estimates are suggestions, not guaranteed savings or market rates.
-Local automated tests force example mode and never consume your account credits.
-Live drafting and effort estimation were verified with a dummy request on 14 October 2026.
-See the [Astropods gateway documentation](https://docs.astropods.com/ai-gateway).
+Approval stores a snapshot of the scope, assumptions, customer, price and revision. Editing an unpaid quote invalidates approval. Order creation and capture use server-side amounts and saved retry identifiers. The server checks quote linkage, currency, total, recipient and completed capture before storing a receipt. An uncertain capture blocks edits and recovers the same order after reload. Attempts older than five hours require a manual sandbox check.
 
-## Build and verify
+Data is local in `work/agree-first.sqlite`; use `AGREE_FIRST_DATABASE_PATH` to choose another path. `PORT` defaults to 3001. The API binds to loopback and rejects cross-site requests. [Architecture and tradeoffs](docs/architecture.md).
 
-```powershell
-.\scripts\run.ps1 typecheck
-.\scripts\run.ps1 test
-.\scripts\run.ps1 build
-.\scripts\run.ps1 test:e2e
-.\scripts\run.ps1 start
-```
+## Scope of this prototype
 
-After building, `start` serves the application and API together at
-[http://127.0.0.1:3001](http://127.0.0.1:3001). Do not run the production and
-development API commands at the same time on the same port.
+This is a local workspace for one freelancer. Customer view is a local review page, not a remote sharing portal. Authentication, teams, email delivery, tax, refunds, deposits and production payments are outside this build. Effort ranges are suggestions, not measured productivity gains, market rates or guaranteed savings. The tool is intended to clarify scope; it cannot guarantee the absence of disagreements.
 
-The browser suite uses Playwright Chromium. Install its browser with the local
-runtime if it is missing:
+## Submission preparation
 
-```powershell
-$env:PLAYWRIGHT_BROWSERS_PATH = Join-Path (Get-Location).Path '.tools\playwright'
-& .\.tools\node-v22.23.3-win-x64\node.exe .\node_modules\@playwright\test\cli.js install chromium
-```
+[Official challenge](https://paypalaihackathon.devpost.com/) · [Official rules](https://paypalaihackathon.devpost.com/rules) · [Submission draft](docs/submission.md) · [Demo script](docs/demo-script.md) · [Review checklist](docs/review-checklist.md)
 
-For Windows ARM64, use the `win-arm64` runtime folder. On other systems, use a
-compatible Node 22 release (22.22.3 or newer), then `npm ci`, `npm run dev`,
-`npm test`, and `npm run build`.
+Deadline checked on 10 November 2026: **12 November 2026, 12:00 PST / 20:00 UTC / 23:00 Asia/Baghdad**. Recheck the official page before submitting. The owner approved source and demo publication on 10 November 2026. Final Devpost submission remains with the owner.
 
-Tests use temporary databases and controlled payment-provider responses. They
-do not charge anyone or contact PayPal. A real sandbox transaction is a separate
-check that requires credentials.
-
-## Structure and configuration
-
-- `apps/web`: Angular 22, Angular Material, shared components, and plain English UI.
-- `apps/api`: Express, approval rules, example drafting, and sandbox payments.
-- `packages/shared`: Zod validation, quote types, and exact money parsing.
-- `scripts`: portable Windows runtime and startup commands.
-
-Runtime data is stored in `work/agree-first.sqlite`. Override it with
-`AGREE_FIRST_DATABASE_PATH`. The server binds to loopback; `PORT` defaults to
-3001. The development frontend uses 4200 and proxies API calls to 3001.
-
-This is a single-freelancer local prototype. Customer view is a local review page,
-not an externally accessible customer portal. Accounts, teams, emails, taxes,
-deposits, refunds, and extra-work payments are outside this version.
-
-## Hackathon status
-
-Target effort: 25–35 hours at 5–10 hours per week. Maximum experiment budget:
-EUR 30; no spending is authorized. Competitive prizes are not predictable income.
-
-The checked deadline is 12 November 2026 at 12:00 PST / 21:00 Europe/Amsterdam.
-Recheck the [official rules](https://paypalaihackathon.devpost.com/rules) and
-[overview](https://paypalaihackathon.devpost.com/) before submission.
-
-See `temp/todo.md` for progress and the submission checklist, and `AGENTS.md` for
-workspace instructions. Sandbox checkout and live AI have been demonstrated locally. The submission checklist still needs completion. No publishing,
-deployment, account creation, registration, or contest submission was performed.
-
-
-
-## Verification recorded
-
-The production build and typecheck pass. All 106 backend, 25 frontend, and 25 local connection tests pass, and the
-desktop/mobile browser scenarios have been verified, including question editing after saves and payment
-recovery after reload. Live preview desktop/mobile layouts were inspected.
-On 14 October 2026, the user completed sandbox checkout; the API stores a matching EUR 450.00 payment receipt with order/capture references. Live Astropods drafting and effort comparison have also been verified on a separate dummy draft; its final price remained unchanged.
-
-
-
-
-
-
-
-
-
+Source license: [MIT](LICENSE), prepared for owner review before public release. Dependency licenses continue to apply.
