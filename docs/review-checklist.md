@@ -14,7 +14,7 @@ Deadline: **12 November 2026 at 12:00 PST / 20:00 UTC / 21:00 Amsterdam / 23:00 
 | Functional build and complete run instructions | README and judge walkthrough; 195 local tests and remote verification passed |
 | Feature description | `docs/submission.md` ready to paste into Devpost |
 | Public open-source repository | [https://github.com/anher7/paypal-ai-hackathon](https://github.com/anher7/paypal-ai-hackathon); GitHub detects MIT; anonymous access verified |
-| Public YouTube demo under three minutes | [1:48 demo](https://www.youtube.com/watch?v=q8FIuu2s7Wc); public publication confirmed and playback checked |
+| Public YouTube demo under three minutes | [1:48 demo](https://www.youtube.com/watch?v=zGF5sLGDTYs); public publication confirmed and playback checked |
 | English submission materials | Complete |
 | Entrant details and free judging access | Owner confirms these in the final submission |
 

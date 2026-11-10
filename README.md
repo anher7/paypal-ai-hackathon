@@ -6,7 +6,7 @@ A freelancer hears “a website with a booking form.” The customer might mean 
 
 AI helps draft the agreement and compare effort with and without an AI agent. The freelancer settles the details and chooses the price. The customer reviews the approved revision. PayPal confirms payment against that exact revision and amount.
 
-[Watch the 1:48 working demo](https://www.youtube.com/watch?v=q8FIuu2s7Wc) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062)
+[Watch the 1:48 working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062)
 
 ![Agree First local sample workspace](docs/screenshots/home.jpg)
 

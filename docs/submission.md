@@ -57,7 +57,7 @@ TypeScript, Angular, Angular Material, Node.js, Express, SQLite, Drizzle ORM, Zo
 ## Published links and final entrant details
 
 - Public source and local run instructions: https://github.com/anher7/paypal-ai-hackathon
-- Public YouTube demonstration: https://www.youtube.com/watch?v=q8FIuu2s7Wc (1:48, actual workflow and sandbox receipt).
+- Public YouTube demonstration: https://www.youtube.com/watch?v=zGF5sLGDTYs (1:48, actual workflow and sandbox receipt).
 - License: MIT, detected by GitHub.
 - Remote verification: https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062 (passed). Local verification: 195 tests passed.
 - Functional demo: local setup and judge walkthrough in README; no hosted demo is claimed.
