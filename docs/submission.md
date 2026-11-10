@@ -54,12 +54,15 @@ Authenticated customer sharing, payment webhooks, agreement version comparison a
 
 TypeScript, Angular, Angular Material, Node.js, Express, SQLite, Drizzle ORM, Zod, PayPal Orders v2, Astropods AI Gateway, Claude Haiku 4.5, Playwright, Vitest.
 
-## Links and facts to finalize after review
+## Published links and final entrant details
 
-- Repository: https://github.com/anher7/paypal-ai-hackathon: **currently private; public release requires owner approval**.
-- Video: **1:48 local video completed; owner review and approved public YouTube upload pending**.
+- Public source and local run instructions: https://github.com/anher7/paypal-ai-hackathon
+- Public YouTube demonstration: https://www.youtube.com/watch?v=q8FIuu2s7Wc (1:48, actual workflow and sandbox receipt).
+- License: MIT, detected by GitHub.
+- Remote verification: https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062 (passed). Local verification: 195 tests passed.
 - Functional demo: local setup and judge walkthrough in README; no hosted demo is claimed.
-- Team and eligibility: owner confirms the correct entrant/team, residency, ownership and hackathon-period work.
-- Preferred positioning: clear purchasing decisions for freelancers; strong PayPal + AI integration. Do not claim autonomous agentic checkout or an Astropods-specific prize without current official eligibility evidence.
-- Source license prepared: MIT. Owner reviews before repository publication.
-- Testing results: use the dated local review report; do not invent live checks or remote CI results.
+- Entrant must confirm the correct team, eligibility, residency, ownership and hackathon-period work in the final Devpost form.
+- Keep the repository and video public through 15 December 2026. Confirm that the judge setup provides any necessary free external-service access through that date. Do not publish private API credentials.
+- Positioning: clear purchasing decisions for freelancers and strong PayPal + AI integration. No autonomous-payment or unverified sponsor-prize claims.
+
+Source and demo publication were approved by the owner on 10 November 2026. The owner will enter or review the Devpost fields and perform the final submission.

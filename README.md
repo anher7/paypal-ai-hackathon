@@ -6,6 +6,8 @@ A freelancer hears “a website with a booking form.” The customer might mean 
 
 AI helps draft the agreement and compare effort with and without an AI agent. The freelancer settles the details and chooses the price. The customer reviews the approved revision. PayPal confirms payment against that exact revision and amount.
 
+[Watch the 1:48 working demo](https://www.youtube.com/watch?v=q8FIuu2s7Wc) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062)
+
 ![Agree First local sample workspace](docs/screenshots/home.jpg)
 
 ## Run it on macOS or Linux
@@ -77,7 +79,7 @@ npm run verify
 
 `verify` runs API type checking, backend and frontend unit tests, the gateway-helper tests, a production build, and desktop/mobile browser journeys. On a Linux CI runner, use `npm run browsers:install -- --with-deps`. Browser tests need free loopback ports **3001 and 3002**. They use disposable SQLite databases and controlled providers; they never load local payment credentials or consume AI credits. The SDK/payment fixture is in `tests/support`, outside the production build.
 
-See [test coverage and live checks](docs/testing.md) and [judge instructions](docs/judging.md). The GitHub Actions workflow runs the same verification after publication; its remote result must be checked separately.
+See [test coverage and live checks](docs/testing.md) and [judge instructions](docs/judging.md). The [GitHub Actions verification](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062) passed on the published application revision.
 
 ## How it works
 
@@ -100,4 +102,4 @@ This is a local workspace for one freelancer. Customer view is a local review pa
 
 Deadline checked on 10 November 2026: **12 November 2026, 12:00 PST / 20:00 UTC / 23:00 Asia/Baghdad**. Recheck the official page before submitting. The owner approved source and demo publication on 10 November 2026. Final Devpost submission remains with the owner.
 
-Source license: [MIT](LICENSE), prepared for owner review before public release. Dependency licenses continue to apply.
+Source license: [MIT](LICENSE). Dependency licenses continue to apply.

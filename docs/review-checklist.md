@@ -1,45 +1,40 @@
 # Release and submission review
 
-Prepared 10 November 2026. Nothing has been submitted or published by this work.
+Updated 10 November 2026. The owner approved source and demo publication. Both are public. Final Devpost submission remains with the owner.
 
-Official references: [challenge](https://paypalaihackathon.devpost.com/) and [rules](https://paypalaihackathon.devpost.com/rules).
+Official references: [challenge](https://paypalaihackathon.devpost.com/) and [rules](https://paypalaihackathon.devpost.com/rules), rechecked 10 November 2026.
 
-Deadline: **12 November 2026 at 12:00 PST / 20:00 UTC / 23:00 Baghdad**. Plan to finish well before the cutoff. Judging access must remain available through **15 December 2026**.
+Deadline: **12 November 2026 at 12:00 PST / 20:00 UTC / 21:00 Amsterdam / 23:00 Baghdad**. Submit well before the cutoff. Judging access must remain available through **15 December 2026**.
 
-## Requirements and present state
+## Requirements and evidence
 
 | Requirement | State / evidence |
 | --- | --- |
-| PayPal sandbox + AI application | Live AI drafting/estimation and completed EUR 1.00 sandbox capture verified |
-| Working functional build and clear run instructions | README and judge walkthrough prepared; local automated results in review report |
-| Feature description | `docs/submission.md` prepared for owner review |
-| Public source repository with open-source license | MIT file prepared; GitHub repository is currently private; release approval pending |
-| Public YouTube demonstration under three minutes | Completed 1:48 local video; owner review and public upload pending |
-| English submission materials | Prepared |
-| Entrant eligibility, ownership, registration and hackathon-period work | Owner confirmation required; user reports Devpost/YouTube accounts ready |
-| Free judging access through end of judging | Local run instructions prepared; owner must confirm durable external-service access instructions |
+| Working PayPal sandbox + AI application | Fresh live drafting/estimation and EUR 1.00 completed sandbox capture verified |
+| Functional build and complete run instructions | README and judge walkthrough; 195 local tests and remote verification passed |
+| Feature description | `docs/submission.md` ready to paste into Devpost |
+| Public open-source repository | [https://github.com/anher7/paypal-ai-hackathon](https://github.com/anher7/paypal-ai-hackathon); GitHub detects MIT; anonymous access verified |
+| Public YouTube demo under three minutes | [1:48 demo](https://www.youtube.com/watch?v=q8FIuu2s7Wc); public publication confirmed and playback checked |
+| English submission materials | Complete |
+| Entrant details and free judging access | Owner confirms these in the final submission |
 
-## Owner review gate
+## Publication completed
 
-- [ ] Review the app and local test report.
-- [x] Verify fresh live AI drafting and effort estimation on this Mac.
-- [x] Verify real sandbox OAuth, order creation and cancellation.
-- [x] Complete and verify the final sandbox capture after owner confirmation.
-- [ ] Review project description and exact claims against the footage.
-- [ ] Confirm entrant/team details, eligibility and project ownership.
-- [ ] Approve MIT licensing and public source release; inspect tracked files for secrets.
-- [ ] Review the finished video, then approve public YouTube upload.
-- [ ] Approve the final repository revision, video URL and Devpost fields.
-- [ ] Explicitly authorize final submission.
+- [x] Owner approved the app, source and video publication.
+- [x] Fresh live AI and PayPal sandbox capture verified.
+- [x] Committed and pushed reviewed source to `master`.
+- [x] Excluded `AGENTS.md` in any casing, `temp/`, `.env` and environment variants. Only the empty `.env.example` template is tracked. Git history and publishable source were checked.
+- [x] Made GitHub public and verified anonymous access and MIT detection.
+- [x] [Remote application verification passed](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062).
+- [x] Published the approved video publicly; YouTube reported no copyright issues.
+- [x] Checked watch-page playback and duration.
 
-## After approval only
+## Owner's final submission
 
-- [ ] Commit and push the reviewed revision.
-- [ ] Make the source repository public and confirm access while signed out.
-- [ ] Verify GitHub detects the MIT license and run the prepared remote workflow.
-- [ ] Upload the approved video publicly; test the link signed out and check duration.
-- [ ] Enter the approved fields and URLs in Devpost; resolve any additional mandatory form fields.
-- [ ] Submit only after explicit owner authorization.
-- [ ] Verify the submission receipt/status and save its URL.
+- [ ] Enter/review the description from `docs/submission.md`, public repository URL and YouTube URL in Devpost.
+- [ ] Confirm entrant/team, residency, eligibility, ownership and work during the hackathon period.
+- [ ] Confirm free judging access through 15 December using the documented local build and any necessary external-service access instructions. Keep private credentials out of public fields.
+- [ ] Resolve any extra mandatory Devpost fields and review the official rules.
+- [ ] Perform the final submission and save its confirmation URL/status.
 
-No outcome, sponsor category or prize is guaranteed. The submission should demonstrate a reliable and useful workflow, with clear boundaries and no invented impact measurements.
+No Devpost submission has been made by this work. No prize outcome is guaranteed.

@@ -172,4 +172,3 @@ Runtime data is stored in `work/agree-first.sqlite`. Override it with
 This is a single-freelancer local prototype. Customer view is a local review page,
 not an externally accessible customer portal. Accounts, teams, emails, taxes,
 deposits, refunds, and extra-work payments are outside this version.
-
