@@ -19,3 +19,6 @@ test-results/
 
 [Aa][Gg][Ee][Nn][Tt][Ss].[Mm][Dd]
 temp/
+
+apps/hosted/src/assets.generated.json
+.wrangler/

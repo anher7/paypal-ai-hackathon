@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "npm run build -w @agree-first/shared && npm run build -w @agree-first/api && npm run build -w @agree-first/web",
+    "build": "npm run build -w @agree-first/shared && npm run build -w @agree-first/api && npm run build -w @agree-first/web && node scripts/build-hosted.mjs",
     "test": "npm run test -w @agree-first/api && npm run test -w @agree-first/web && node --test scripts/astropods-gateway/connect.test.mjs && node --test scripts/astropods-gateway/setup.test.mjs",
     "test:e2e": "playwright test",
     "start": "node apps/api/dist/index.js",
@@ -23,13 +23,16 @@
     "pretypecheck": "npm run build -w @agree-first/shared",
     "browsers:install": "node scripts/install-browsers.mjs",
     "doctor": "node scripts/doctor.mjs",
-    "verify": "npm run typecheck && npm test && npm run build && npm run test:e2e",
+    "verify": "npm run typecheck && npm test && npm run build && npm run test:e2e && npm run typecheck:hosted && npm run test:hosted",
     "ai:setup": "node scripts/setup-ai.mjs",
     "ai:login": "node scripts/login-ai.mjs",
-    "ai:connect": "node scripts/setup-ai.mjs && node scripts/connect-ai.mjs"
+    "ai:connect": "node scripts/setup-ai.mjs && node scripts/connect-ai.mjs",
+    "test:hosted": "npm run build -w @agree-first/shared && cd apps/hosted && vitest run",
+    "typecheck:hosted": "tsc -p apps/hosted/tsconfig.json"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",
+    "esbuild": "0.28.2",
     "typescript": "6.0.2"
   },
   "license": "MIT"

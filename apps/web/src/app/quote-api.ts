@@ -26,7 +26,7 @@ export class QuoteApi {
 
 export function errorMessage(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
-    if (error.status === 0) { return 'We could not reach the local server. Check that it is running, then try again.'; }
+    if (error.status === 0) { return 'We could not reach the server. Check your connection, then try again.'; }
     return error.error?.error?.message ?? 'That did not work. Please try again.';
   }
   return error instanceof Error ? error.message : 'That did not work. Please try again.';

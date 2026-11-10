@@ -146,7 +146,7 @@ export interface AppConfig {
   aiMode: 'examples' | 'live';
   aiConfigured?: boolean;
   aiModel?: string | null;
-  localOnly: true;
+  localOnly: boolean;
 }
 
 export interface OrderResult {
