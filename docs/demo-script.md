@@ -1,20 +1,9 @@
-# Demo recording for owner review
+# Demo videos
 
-The final local video is **1:48**, in English, with a natural neural voice and captions. It shows one fresh quote moving through the actual application. It has not been uploaded or submitted.
+The current public Anher Builds video remains the approved1:48 complete workflow: https://www.youtube.com/watch?v=zGF5sLGDTYs . It shows actual input, liveAI, settlement, explicit price choice, customer consent, real PayPal sandbox capture and receipt reload.
 
-| Time | Actual recorded actions |
-| --- | --- |
-| 0:00 to 0:22 | Enter the cafe-menu request, create the quote, click Generate AI draft and show the live response. |
-| 0:22 to 0:43 | Follow the revision phrase to its question. Type two explicit assumptions and an answer about crop marks. |
-| 0:43 to 1:00 | Enter an hourly rate and request a live estimate. Compare both delivery options. |
-| 1:00 to 1:09 | Choose a price suggestion, change it to EUR 1.00 for the sandbox test, approve and open customer review. |
-| 1:09 to 1:28 | Review the assumptions, confirm consent, open the actual PayPal card form, enter published test data and select EUR. |
-| 1:28 to 1:48 | Click the owner-approved sandbox Pay button, wait for provider confirmation, reload the receipt and show the paid editor lock. |
+A revised2:16cut is prepared for owner review. It keeps the actual cafe-menu flow and verified EUR1capture, changes the opening narration to explain revision ambiguity, and adds a clearly labeled separate website example showing private customer-link creation, scope/price changes, old-link rejection and a replacement agreement. The website changes from EUR450 inquiry-only work to EUR650with livecalendar availability. No payment is made on that separate example. Any linktokenvisibleinfootage was revoked after recording.
 
-The recording captures typing, clicks, loading and resulting state while those actions happen. Cuts between action segments omit tool-roundtrip and AI waiting time; the AI cut is labeled. No steps are reconstructed from saved quote snapshots. The final receipt belongs to the same fresh quote and provider order shown at checkout. Source capture is approximately 10 to 16 frames per second, encoded as a 30 fps MP4.
+The narration uses local Kokoro v1.0, af_heart, with captions and self-hosted SourceSans3. Video and audio streams both last136.23seconds. The entire export decoded successfully; action and finalframes were inspected, and added narration was checked with local speech recognition. Cuts omit tool-roundtriptime; short pauses afteractions allow the agreement text to be read. Steps were performed in the actual app and were not reconstructed from savedscreenshots.
 
-The exported video transcript is authoritative for the narration. The voice is generated locally using Kokoro v1.0, preset af_heart. Card and contact fields contain only PayPal’s published sandbox test card and dummy details. No real money was charged.
-
-Quote `e337a0a0-4b0e-4b3c-87a4-ace4b36ae278`, approved revision 5. Order `16H82723CL764350L`, capture `5RL79013CT810124W`, amount EUR 1.00.
-
-Before public upload, the owner reviews the final video, claims, license and submission fields.
+The revised upload awaits owner approval of the newcut and YouTube's displayed uploadterms. The public video link is not replaced until publication actually succeeds. The contest entry remains an unsubmitted draft.

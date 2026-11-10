@@ -4,54 +4,50 @@ Project: Agree First
 
 Tagline: Agree on the scope before you get paid.
 
-[Try the hosted app](https://agree-first.tameforum1.chatgpt.site) · [Watch the 1:48 demo](https://www.youtube.com/watch?v=zGF5sLGDTYs)
+[Try Agree First](https://agree-first.tameforum1.chatgpt.site) · [Watch the working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs)
 
-## Inspiration
+## The problem
 
-“Build a website with a booking form” sounds simple until the freelancer and customer mean different things. An inquiry form and a live scheduling system are different jobs. A checkout total alone does not explain which one the customer is buying.
+A customer asks for “a cafe menu with revisions, print-ready by Friday.” The designer hears two revision rounds and a PDF. The customer might expect changes until satisfied, editable files and printed menus. They can agree to the same price while picturing different jobs.
 
-Agree First puts that conversation before payment. It is for independent freelancers and small service studios who need to agree on what a price covers before starting work. The selling point is straightforward: catch scope creep before checkout.
+Agree First is for independent freelancers and small service studios doing fixed-price work. It makes those differences visible before payment: agree on what the price covers, then get paid.
 
 ## What it does
 
-A freelancer pastes a customer request. AI drafts included work, exclusions, customer inputs and clarification questions. Each question points back to the phrase that prompted it. The freelancer answers the question or records an explicit assumption that the customer can see. Unresolved questions block approval.
+AI proposes included work, exclusions, customer inputs and questions tied to the exact words that need clarification. Clicking “revisions” takes the freelancer to the question about what counts as a revision. Every question needs an answer or an explicit assumption before approval.
 
-The same scope can be estimated with and without an AI delivery agent. The comparison includes human planning, review, corrections and testing. An optional hourly rate turns time ranges into suggested prices. The freelancer must deliberately choose a suggestion or enter a final total.
+People choose the terms and final price. An optional effort comparison estimates the same promised work with and without an AI delivery agent, including human review, corrections and testing. Suggestions never silently become the price.
 
-Approval fixes the agreement at one revision. The customer reviews that exact snapshot, confirms the scope and pays through PayPal sandbox checkout. The server checks the recipient, amount, currency, quote revision and completed capture before storing a receipt. Uncertain payments recover the same order after a reload. Paid agreements are read-only and can be printed or saved as PDF.
+Approval fixes one scope revision and EUR total. The freelancer creates a private customer link that opens on another browser or device. The customer sees only that approved agreement, confirms it and pays through PayPal sandbox checkout. Private effort estimates and editing controls stay with the freelancer.
 
-## Why PayPal + AI
+Changing unpaid scope or price invalidates the old approval and its customer link. Links also expire after seven days and can be closed or replaced. The server checks the stored revision, amount, currency, recipient and completed capture before saving a receipt. Uncertain payments recover the same order. Paid agreements are read-only and printable.
 
-AI helps resolve uncertainty before a purchase. PayPal completes the purchase against what people approved. The model cannot approve an agreement or authorize payment, and the payment API does not trust an amount sent by the browser. The scope, approved revision and verified payment stay connected.
+## Why combine AI and PayPal?
+
+An AI assistant, proposal document and payment link can produce a good agreement. Agree First adds an enforced connection between the clarification, human decision, approved revision and verified payment. People do not have to rely only on copying the right text and remembering which version a payment link belongs to.
+
+The model cannot approve a quote or authorize payment. PayPal checkout uses the approved server record, not a total supplied by the browser. That connection is the product, rather than AI-generated wording alone.
 
 ## How it is built
 
-Angular 22 and Angular Material provide the responsive interface. The local Express API stores quotes, approval snapshots and payment attempts in SQLite through Drizzle. The public demo uses a Cloudflare Worker and D1 with the same quote and payment rules. Each browser has an isolated workspace, and durable checkpoints preserve payment attempts across requests. Shared Zod schemas validate input and model output. Money is stored as integer EUR cents.
+Angular 22 and Material provide the interface. A Cloudflare Worker and D1 run the public demo; the independent local build uses Express and SQLite through Drizzle. Both share the quote and payment rules. Zod validates inputs and model output, and integer cents preserve exact totals. Astropods connects Claude Haiku 4.5; PayPal Orders v2 creates and captures sandbox orders. Durable checkpoints and persisted retry identifiers protect payment recovery. Customer links use random tokens stored only as hashes, scoped to one approved revision.
 
-The AI integration uses the Astropods gateway with Claude Haiku 4.5. PayPal Orders v2 handles server-side sandbox order creation and capture with persisted retry identifiers. A clearly labeled predefined example is available for sample drafting. Fresh requests and connected effort estimates use live AI.
+## What is demonstrated
 
-## Challenges
+250 automated tests pass across the API, interface, hosted persistence and desktop/mobile browser journeys, with production builds, type checking and GitHub Actions verification. Actual EUR1 sandbox captures completed locally and on the hosted app. The hosted receipt survived reload and deployment, and its editor remained locked.
 
-A payment timeout does not prove that payment failed. Agree First preserves the attempt, blocks edits while capture is uncertain and checks the same order again. Keeping model suggestions separate from human decisions also mattered: drafting and estimating never silently choose the freelancer’s final price or bypass approval.
+A small, developer-run live-model evaluation uses four predefined briefs and publishes the outputs and review rubric. It exposed a draft that incorrectly excluded requested support, which led to clearer instructions about preserving requested work pending clarification. This is engineering evidence, not user research or proof of fewer disputes.
 
-## Accomplishments
+The video shows actual application use, live drafting and estimation, human decisions, PayPal checkout and a verified receipt. The labeled predefined sample is separate from live AI.
 
-The complete workflow runs from a fresh request to an approved agreement and verified sandbox receipt. The 1:48 video shows actual input, live AI drafting and estimation, question resolution, price choice, customer consent, PayPal checkout and the same quote’s receipt after reload.
+## What we learned and what comes next
 
-Verification includes 229 passing local tests, production builds, type checking and passing GitHub Actions verification. Coverage includes approval invalidation, exact amounts, duplicate payment protection, provider errors, cancellation and timeout recovery. Real EUR 1.00 sandbox captures were completed locally and on the public hosted app with dummy customer details; the hosted receipt survived reload and its paid editor was locked. No real money was charged.
+Reliable payment retries and clear uncertainty are part of the customer experience. A useful draft must surface a decision without pretending it has already been agreed.
 
-## What we learned
+We have not measured time savings, adoption or dispute reduction. A five-minute freelancer test and predefined comprehension measures are included in the repository so those claims can be tested. Next steps include that research, authenticated customer identities, payment webhooks and agreement version comparison. Link possession grants access to an agreement; it is not identity verification or a digital signature.
 
-The agreement and payment need to refer to the same version of the work. Reliable retry behavior is part of the customer experience. AI is more useful here when its proposals are visible and editable than when it hides uncertainty behind a single confident quote.
+## Try it
 
-## What’s next
+Open the [public app](https://agree-first.tameforum1.chatgpt.site), use dummy details and create a quote. After approval, use Create customer link to review from a different browser. The hosted gateway has network, workspace and shared usage limits to bound misuse. The static sample and manual editing remain available after AI limits are reached. PayPal uses test money only.
 
-Authenticated customer sharing, payment webhooks, agreement version comparison and user research with freelancers. The prototype supports one freelancer per browser workspace, either hosted or running locally. Customer review currently stays in that same workspace; cross-device sharing is future work. Effort estimates are suggestions; measured dispute reduction and productivity gains have not been established.
-
-## Run and test it
-
-Open the [public hosted app](https://agree-first.tameforum1.chatgpt.site), with no installation or application login. Use dummy data and keep the same browser for the editor, customer review and receipt. Hosted AI uses a dedicated private gateway key. To protect the demo allowance, live requests are capped per browser, per network and globally, including a persistent total cap. If a limit is reached, the labeled sample draft and manual quote workflow remain available.
-
-For an independent local build, use Node 22.23.3. Complete setup and a judge walkthrough are in the [README](https://github.com/anher7/paypal-ai-hackathon#run-it-on-macos-or-linux) and [judge instructions](https://github.com/anher7/paypal-ai-hackathon/blob/master/docs/judging.md). Local live requests and payments use your own documented Astropods gateway and PayPal sandbox settings; keep those credentials private.
-
-[Public MIT source](https://github.com/anher7/paypal-ai-hackathon) · [Working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verification report](https://github.com/anher7/paypal-ai-hackathon/blob/master/docs/verification.md)
+[Public MIT source and local setup](https://github.com/anher7/paypal-ai-hackathon) · [Judge walkthrough](https://github.com/anher7/paypal-ai-hackathon/blob/master/docs/judging.md) · [Verification](https://github.com/anher7/paypal-ai-hackathon/blob/master/docs/verification.md)
