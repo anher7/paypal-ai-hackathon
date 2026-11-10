@@ -6,7 +6,7 @@ A freelancer hears “a website with a booking form.” The customer might mean 
 
 AI helps draft the agreement and compare effort with and without an AI agent. The freelancer settles the details and chooses the price. The customer reviews the approved revision. PayPal confirms payment against that exact revision and amount.
 
-[Try the hosted app](https://agree-first.tameforum1.chatgpt.site) · [Watch the 1:48 working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062)
+[Try the hosted app](https://agree-first.tameforum1.chatgpt.site) · [Watch the 1:48 working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42851146661)
 
 ![Agree First local sample workspace](docs/screenshots/home.jpg)
 
@@ -85,7 +85,7 @@ npm run verify
 
 `verify` runs API type checking, backend and frontend unit tests, the gateway-helper tests, a production build, and desktop/mobile browser journeys. On a Linux CI runner, use `npm run browsers:install -- --with-deps`. Browser tests need free loopback ports **3001 and 3002**. They use disposable SQLite databases and controlled providers; they never load local payment credentials or consume AI credits. The SDK/payment fixture is in `tests/support`, outside the production build.
 
-See [test coverage and live checks](docs/testing.md) and [judge instructions](docs/judging.md). The [GitHub Actions verification](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062) passed on the published application revision.
+See [test coverage and live checks](docs/testing.md) and [judge instructions](docs/judging.md). The [GitHub Actions verification](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42851146661) passed on the published application revision.
 
 ## How it works
 
