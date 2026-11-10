@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import {
@@ -75,7 +76,8 @@ export function createAiDraftProvider(environment: NodeJS.ProcessEnv = process.e
     const timeout = setTimeout(() => controller.abort(), options.timeoutMilliseconds ?? 45000);
     try {
       const response = await request(endpoint!, {
-        method: 'POST', redirect: 'error', signal: controller.signal,
+        // Workers supports manual redirects; non-2xx responses are rejected below.
+        method: 'POST', redirect: 'manual', signal: controller.signal,
         headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model, max_tokens: 3000, stream: false,
@@ -131,6 +133,8 @@ export function createAiDraftProvider(environment: NodeJS.ProcessEnv = process.e
       return parsed.data;
     } catch (error) {
       if (error instanceof AppError) throw error;
+      const reason = error instanceof Error ? error.message.replaceAll(apiKey || '__unset_key__', '[secret]').replace(/https?:\/\/[^\s]+/g, '[url]').slice(0, 180) : 'Unknown transport error';
+      console.error('AI transport failure', error instanceof Error ? error.name : 'Unknown', reason);
       if (controller.signal.aborted) throw new AppError('AI_TIMEOUT', 'The AI request took too long. Your saved work is unchanged.', 504);
       throw new AppError('AI_UNAVAILABLE', 'The AI gateway could not be reached. Your saved work is unchanged.', 503);
     } finally {

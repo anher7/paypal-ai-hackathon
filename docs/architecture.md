@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-The browser sends validated JSON to a local Express API. The API is the authority for revisions, prices, approval and payment status. SQLite stores quote payloads, immutable approval snapshots and retry identifiers. AI and PayPal run behind separate provider interfaces, which makes error paths testable without external calls.
+The browser sends validated JSON to an API. The local build uses Express and SQLite; the hosted build serves the same Angular interface and quote/payment service through a Cloudflare Worker and D1. The API is the authority for revisions, prices, approval and payment status. SQLite stores quote payloads, immutable approval snapshots and retry identifiers. AI and PayPal run behind separate provider interfaces, which makes error paths testable without external calls.
 
 ```mermaid
 sequenceDiagram
@@ -41,4 +41,4 @@ A quote-level operation lock and optimistic revisions reject concurrent/stale up
 
 ## Deliberate limits
 
-Loopback-only operation avoids pretending an unauthenticated prototype is a public customer portal. SQLite keeps setup small. A remote product would need authenticated freelancer/customer identities, access-controlled sharing, durable hosting, payment webhooks and a documented reconciliation process. A hosted public URL is not part of this build. The current receipt is a sandbox payment record, not a tax invoice or an escrow guarantee.
+SQLite keeps local setup small. The public demo uses isolated anonymous browser workspaces in D1, with fenced per-quote leases and atomic quote/payment-attempt updates. It checkpoints state before external payment calls. A customer portal would additionally need authenticated identities, access-controlled cross-device sharing, payment webhooks and an operational reconciliation process. See [hosting details](hosting.md). The current receipt is a sandbox payment record, not a tax invoice or an escrow guarantee.

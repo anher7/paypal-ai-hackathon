@@ -16,6 +16,32 @@ function completion(value: unknown, finishReason = 'stop') {
 afterEach(() => vi.restoreAllMocks());
 
 describe('private AI gateway drafting', () => {
+  it('redacts credentials and provider URLs from transport diagnostics', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const request = vi.fn<typeof fetch>().mockRejectedValue(new TypeError('Failed https://private.example.test/path with dummy-private-key'));
+    await expect(createAiDraftProvider(environment, { fetch: request }).draft('booking form')).rejects.toMatchObject({ code: 'AI_UNAVAILABLE' });
+    const diagnostics = JSON.stringify(log.mock.calls);
+    expect(diagnostics).toContain('TypeError');
+    expect(diagnostics).not.toContain('dummy-private-key');
+    expect(diagnostics).not.toContain('private.example.test');
+    expect(diagnostics).toContain('[secret]');
+    expect(diagnostics).toContain('[url]');
+  });
+
+  it('parses gateway bytes when the Worker has no global Buffer', async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(completion(draft));
+    const provider = createAiDraftProvider(environment, { fetch: request });
+    let result;
+    vi.stubGlobal('Buffer', undefined);
+    try {
+      result = await provider.draft('Please build a booking form.');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    expect(result).toMatchObject({ source: 'ai', included: ['An inquiry form.'] });
+    expect(request).toHaveBeenCalledTimes(1);
+  });
+
   it('sends one authenticated request and creates unanswered server question IDs', async () => {
     const request = vi.fn<typeof fetch>().mockResolvedValue(completion(draft));
     const provider = createAiDraftProvider(environment, { fetch: request });
@@ -26,13 +52,24 @@ describe('private AI gateway drafting', () => {
     expect(request).toHaveBeenCalledTimes(1);
     const [url, options] = request.mock.calls[0];
     expect(url).toBe('https://gateway.example.test/v1/chat/completions');
-    expect(options?.redirect).toBe('error');
+    expect(options?.redirect).toBe('manual');
     expect(options?.headers).toMatchObject({ Authorization: 'Bearer dummy-private-key' });
     const body = JSON.parse(String(options?.body));
     expect(body.model).toBe('claude-haiku-4-5');
     expect(body.stream).toBe(false);
     expect(body).not.toHaveProperty('tools');
     expect(body).not.toHaveProperty('response_format');
+  });
+  it.each([301, 302, 303, 307, 308])('rejects HTTP %s redirects without following their Location', async (status) => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, {
+      status, headers: { Location: 'https://different-host.example/collect' },
+    }));
+    const provider = createAiDraftProvider(environment, { fetch: request });
+    await expect(provider.draft('Please build a booking form.')).rejects.toMatchObject({ code: 'AI_UNAVAILABLE', status: 503 });
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request.mock.calls[0][0]).toBe('https://gateway.example.test/v1/chat/completions');
+    expect(request.mock.calls[0][1]).toMatchObject({ redirect: 'manual' });
+    expect(request.mock.calls.some(([url]) => String(url).includes('different-host.example'))).toBe(false);
   });
   it('does not duplicate /v1 in a configured base URL', async () => {
     const request = vi.fn<typeof fetch>().mockResolvedValue(completion(draft));

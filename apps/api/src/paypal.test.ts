@@ -20,6 +20,26 @@ const order: PaypalOrder = {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('PayPal sandbox transport', () => {
+  it('authenticates sandbox OAuth when the Worker has no global Buffer', async () => {
+    // Node's Response.json itself needs its global Buffer; Worker responses do not.
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ access_token: 'test-only-token', expires_in: 3600 }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => order });
+    vi.stubGlobal('fetch', fetchMock);
+    const provider = createPaypalProvider({ PAYPAL_CLIENT_ID: 'test-client', PAYPAL_CLIENT_SECRET: 'test-secret' });
+    let result;
+    vi.stubGlobal('Buffer', undefined);
+    try {
+      result = await provider.getOrder('ORDER-TEST');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    expect(result).toEqual(order);
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe('Basic dGVzdC1jbGllbnQ6dGVzdC1zZWNyZXQ=');
+    expect(fetchMock.mock.calls[1][1].headers.Authorization).toBe('Bearer test-only-token');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it('uses sandbox only, server-approved cents, and the stable request ID', async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(Response.json({ access_token: 'test-only-token', expires_in: 3600 }))

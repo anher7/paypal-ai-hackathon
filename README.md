@@ -6,9 +6,15 @@ A freelancer hears “a website with a booking form.” The customer might mean 
 
 AI helps draft the agreement and compare effort with and without an AI agent. The freelancer settles the details and chooses the price. The customer reviews the approved revision. PayPal confirms payment against that exact revision and amount.
 
-[Watch the 1:48 working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062)
+[Try the hosted app](https://agree-first.tameforum1.chatgpt.site) · [Watch the 1:48 working demo](https://www.youtube.com/watch?v=zGF5sLGDTYs) · [Verified build](https://github.com/anher7/paypal-ai-hackathon/actions/runs/42811021062)
 
 ![Agree First local sample workspace](docs/screenshots/home.jpg)
+
+## Try it in your browser
+
+Open [Agree First](https://agree-first.tameforum1.chatgpt.site). No installation or application account is required. Use dummy customer details and sandbox payments only. Each browser gets its own saved workspace; keep its cookies to return to your quotes. A customer-review link currently works inside that same browser workspace. Cross-device customer sharing is future work.
+
+Fresh requests use the owner's hosted Astropods gateway; PayPal sandbox checkout uses the hosted server settings. Live AI has demo usage limits, and the labeled sample remains available when live integration access is unavailable. See [hosting details](docs/hosting.md). The local build below remains available for independent evaluation with your own credentials.
 
 ## Run it on macOS or Linux
 
@@ -38,7 +44,7 @@ Windows: `scripts/setup.ps1` installs a checksum-verified local Node runtime. Th
 6. Without credentials, checkout displays a setup message and stays unpaid. With sandbox credentials, confirm the agreement and complete PayPal checkout using a personal sandbox buyer or a [published sandbox test card](https://developer.paypal.com/sandbox-testing/card-testing).
 7. A completed payment displays the stored order and capture references. Reload to verify persistence. Paid agreements are read-only.
 
-The sample walkthrough is deterministic and consumes no AI credits. A **fresh request** plus **Generate AI draft** is the live AI demonstration; do not present the labeled sample as a live model response.
+With live AI disabled, the labeled sample walkthrough is deterministic and consumes no AI credits. When live AI is connected, effort estimation uses the gateway even for the sample. A **fresh request** plus **Generate AI draft** is the live AI demonstration; do not present the labeled sample as a live model response.
 
 ## Connect real services
 
@@ -85,16 +91,17 @@ See [test coverage and live checks](docs/testing.md) and [judge instructions](do
 
 - `apps/web`: Angular 22 and Angular Material; responsive editor, effort comparison, customer review and receipt.
 - `apps/api`: Express, SQLite/Drizzle, approval rules, AI gateway and PayPal Orders v2.
+- `apps/hosted`: Cloudflare Worker API, D1 persistence, browser workspace isolation and usage limits.
 - `packages/shared`: Zod contracts, types and integer-cent money calculations.
 - `tests`: desktop/mobile workflows, including real API/storage with isolated provider fixtures.
 
 Approval stores a snapshot of the scope, assumptions, customer, price and revision. Editing an unpaid quote invalidates approval. Order creation and capture use server-side amounts and saved retry identifiers. The server checks quote linkage, currency, total, recipient and completed capture before storing a receipt. An uncertain capture blocks edits and recovers the same order after reload. Attempts older than five hours require a manual sandbox check.
 
-Data is local in `work/agree-first.sqlite`; use `AGREE_FIRST_DATABASE_PATH` to choose another path. `PORT` defaults to 3001. The API binds to loopback and rejects cross-site requests. [Architecture and tradeoffs](docs/architecture.md).
+For the local build, data is in `work/agree-first.sqlite`; use `AGREE_FIRST_DATABASE_PATH` to choose another path. `PORT` defaults to 3001. The API binds to loopback and rejects cross-site requests. [Architecture and tradeoffs](docs/architecture.md).
 
 ## Scope of this prototype
 
-This is a local workspace for one freelancer. Customer view is a local review page, not a remote sharing portal. Authentication, teams, email delivery, tax, refunds, deposits and production payments are outside this build. Effort ranges are suggestions, not measured productivity gains, market rates or guaranteed savings. The tool is intended to clarify scope; it cannot guarantee the absence of disagreements.
+The prototype supports one freelancer per browser workspace, either hosted or running locally. Customer review currently stays in that workspace; cross-device sharing is not implemented. Authentication, teams, email delivery, tax, refunds, deposits and production payments are outside this build. Effort ranges are suggestions, not measured productivity gains, market rates or guaranteed savings. The tool is intended to clarify scope; it cannot guarantee the absence of disagreements.
 
 ## Submission preparation
 

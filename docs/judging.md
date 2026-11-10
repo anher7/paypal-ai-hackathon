@@ -2,7 +2,11 @@
 
 Platform: desktop browser; responsive mobile layout. Run locally with Node 22.23.3. Chrome/Chromium is the automated browser target. The mobile suite emulates an iPhone viewport using Chromium; physical iOS/Safari testing is not claimed.
 
-Follow the root README's setup and walkthrough. No application login is required. Use dummy names and requests. Data stays in the local SQLite file.
+Public hosted demo: https://agree-first.tameforum1.chatgpt.site
+
+No installation or application login is required for the hosted demo. Use dummy details. Each browser keeps an isolated workspace in durable cloud storage, accessed through its Secure HttpOnly cookie. Keep the same browser for the editor, customer review and receipt; a review URL alone does not grant another browser access. Hosted AI has bounded demo usage limits. The local build is an independent fallback with your own integration credentials.
+
+Follow the root README's setup and walkthrough. No application login is required. Use dummy names and requests. In the local build, data stays in the local SQLite file.
 
 ## Two honest demonstration paths
 

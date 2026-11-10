@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { z } from 'zod';
 import type { ApprovalSnapshot } from '@agree-first/shared';
 import { AppError } from './errors.js';

@@ -1,5 +1,7 @@
 # Hosted demo
 
+Public URL: https://agree-first.tameforum1.chatgpt.site
+
 The cloud build preserves the Angular interface and quote/payment service. A Cloudflare Worker serves the interface and API. Cloudflare D1 stores each quote and its payment attempts together, with a server-side lease preventing concurrent writes across Worker instances.
 
 ## Visitor workspaces
@@ -27,3 +29,5 @@ Live AI is additionally limited to eight calls per workspace per UTC day. All mu
 Use Node 22.23.3 and `npm ci`, then `npm run build`. The build emits the local Express application and `dist/server/index.js`, a Cloudflare Worker ES module containing the production Angular assets. `.openai/hosting.json` declares the Sites project and D1 binding. The `drizzle/` migration is applied during deployment, never inside a request.
 
 `npm run typecheck:hosted` and `npm run test:hosted` check the hosted adapter. `npm run verify` also runs the existing API, frontend and browser suites. Keep generated assets, local database files, `.env`, temporary folders and AGENTS files out of Git.
+
+The CLI development gateway key is temporary. For unattended judging, configure a dedicated gateway key that remains valid through the judging period; copying a development key does not extend its expiry. Credential values stay in private Sites runtime secrets.
